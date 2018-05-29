@@ -13,7 +13,7 @@ In this capstone project proposal, prior to completing the following **Capstone 
 4. A **solution statement** — a the solution proposed for the problem given;
 5. A **benchmark model** — some simple or historical model or result to compare the defined solution to;
 6. A set of **evaluation metrics** — functional representations for how the solution can be measured;
-7. An outline of the ****project design — how the solution will be developed and results obtained.
+7. An outline of the **project design** — how the solution will be developed and results obtained.
 
 ## Capstone Proposal Highlights
 The capstone project proposal is designed to introduce you to writing proposals for major projects. Typically, before you begin working on a solution to a problem, a proposal is written to your peers, advisor, manager, etc., to outline the details of the problem, your research, and your approach to a solution.
@@ -27,7 +27,13 @@ Things you will learn by completing this project proposal:
 **Please note: Once your Capstone Proposal has been submitted and you have passed the evaluation, you have to submit your Capstone project using the same proposal that you submitted. We do not allow the Capstone Proposal and the Capstone project to differ in terms of dataset and approach.**
 
 ## Capstone Proposal Description
-Think about a technical field or domain that you are passionate about, such as robotics, virtual reality, finance, natural language processing, or even artificial intelligence (the possibilities are endless!). Then, choose an existing problem within that domain that you are interested in which you could solve by applying machine learning algorithms and techniques. Be sure that you have collected all of the resources needed (such as datasets, inputs, and research) to complete this project, and make the appropriate citations wherever necessary in your proposal.
+Think about a technical field or domain that you are passionate about, such as robotics, virtual reality, finance, natural language processing, or even artificial intelligence (the possibilities are endless!). Then, choose an existing problem within that domain that you are interested in which you could solve by applying machine learning algorithms and techniques. Be sure that you have collected all of the resources needed (such as datasets, inputs, and research) to complete this project, and make the appropriate citations wherever necessary in your proposal. Below are a few suggested problem areas you could explore if you are unsure what your passion is:
+
+* [Robot Motion Planning](https://docs.google.com/document/d/1ZFCH6jS3A5At7_v5IUM5OpAXJYiutFuSIjTzV_E-vdE/pub)
+* [Healthcare](https://docs.google.com/document/d/1WzurKKa9AX2DnOH7KiB38mvozdOSemfkGpex8hdTy8c/pub)
+* [Computer Vision](https://docs.google.com/document/d/1y-XfjkPFgUQxFIQ9bBncUSjs4HOf5E-45FrLYNBsZb4/pub)
+* [Education](https://docs.google.com/document/d/1vjerjRQnWs1kLbZagDYT6rNqiwAG23Yj45oUY88IAxI/pub)
+* [Investment and Trading](https://docs.google.com/document/d/1ycGeb1QYKATG6jvz74SAMqxrlek9Ed4RYrzWNhWS-0Q/pub)
 
 **Please note you cannot use the MNIST or SVHN dataset for this project.**
 
