@@ -1,4 +1,4 @@
-# Capstone Proposal Project
+# Capstone Project Proposal
 ## Machine Learning Engineer Nanodegree
 ## Topic: Specialization
 
@@ -33,4 +33,42 @@ Think about a technical field or domain that you are passionate about, such as r
 
 In addition, you may find a technical domain (along with the problem and dataset) as *competitions* on platforms such as [Kaggle](http://kaggle.com/), or [Devpost](http://devpost.com/). This can be helpful for discovering a particular problem you may be interested in solving as an alternative to the suggested problem areas above. In many cases, some of the requirements for the capstone proposal are already defined for you when choosing from these platforms.
 
-To determine whether your project and the problem you want to solve fits Udacity's vision of a Machine Learning Capstone Project , please refer to the [capstone proposal rubric]() and the [capstone project rubric]() and make a note of each rubric criteria you will be evaluated on. A satisfactory project will have a proposal that clearly satisfies these requirements.
+To determine whether your project and the problem you want to solve fits Udacity's vision of a Machine Learning Capstone Project , please refer to the [capstone proposal rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf) and the [capstone project rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_grading_rubric.pdf) and make a note of each rubric criteria you will be evaluated on. A satisfactory project will have a proposal that clearly satisfies these requirements.
+
+## Software Requirements
+Given the free-form nature of the machine learning capstone, the software and libraries you will need to successfully complete your work will vary depending on the chosen application area and problem definition. Because of this, it is imperative that all necessary software and libraries you consider using in your capstone project are accessible clearly documented. Please note that proprietary software, software that requires private licenses, or software behind a paywall or login account should be avoided.
+
+## Data Requirements
+Every machine learning capstone project will most certainly require some form of dataset or input data structure (input text files, images, etc.). Similar to the software requirements above, the data you are considering must either be publicly accessible or provided by you during the submission process, and private or proprietary data should not be used without expressed permission. Please take into consideration the file size of your data — while there is no strict upper limit, input files that are excessively large may require reviewers longer than an acceptable amount of time to acquire all of your project files. This can take away from the reviewer's time that could be put towards evaluating your proposal. If the data you are considering fits the criteria of being too large, consider whether you could work with a subset of the data instead, or provide a representative sample of the data.
+
+## Ethics
+Udacity's A/B Testing course, as part of the Data Analyst Nanodegree, has a segment that discusses [the sensitivity of data](https://classroom.udacity.com/nanodegrees/nd002/parts/00213454013/modules/411033896375460/lessons/3998098714/concepts/39997087540923#) and the expectation of privacy from those whose information has been collected. While most data you find available to the public will not have any ethical complications, it is extremely important that you are considering where the data you are using came from, and whether that data contains any sensitive information. For example, if you worked for a bank and wanted to use customers' bank statements as part of your project, this would most likely be an unethical choice of data and should be avoided.
+
+If you have any questions regarding the nature of a dataset or software you intend to use for the capstone project, please send an email to **machine-support@udacity.com** with the subject *"Capstone Project Dataset/Software Inquiry"*.
+
+## Report Guidelines
+Your project submission will be evaluated on the written proposal that is submitted. Additionally, depending on the project you are proposing, other materials such as the data being used will be evaluated. It is expected that the proposal contains enough detail, documentation, analysis, and discussion to adequately reflect the work you intend to complete for the project. Because of this, it is extremely important that the proposal is written in a professional, standardized way, so those who review your project's proposal are able to clearly identify each component of your project in the report. Without a properly written proposal, your project cannot be sufficiently evaluated. A [project proposal template](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_template.md) is provided for you to understand how a project proposal should be structured. We strongly encourage students to have a proposal that is approximately **two to three pages in length**.
+
+The Machine Learning Capstone Project proposal should be treated no different than a written research paper for academics. Your goal is to ultimately present the research you've discovered into the respective problem domain you've chosen, and then clearly articulate your intended project to your peers. The narrative found in the [project proposal template](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_template.md) provides for a *"proposal checklist"* that will aid you in fully completing a documented proposal. Please make use of this resource!
+
+## Submitting the Project
+
+### Evaluation
+Your project will be reviewed by a Udacity reviewer against the [Capstone Project Proposal rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf). Be sure to review this rubric thoroughly and self-evaluate your project before submission. All criteria found in the rubric must be *meeting specifications* for you to pass.
+
+### Submission Files
+At minimum, your submission will be required to have the following files listed below. If your submission method of choice is uploading an archive (`*.zip`), please take into consideration the total file size. You will need to include
+
+* A project proposal, *in PDF format only*, with the name **proposal.pdf**, addressing each of the seven key points of a proposal. The recommended page length for a proposal is approximately *two to three pages*.
+
+* Any additional supporting material such as datasets, images, or input files that are necessary for your project and proposal. If these files are too large and you are uploading your submission, instead provide appropriate means of acquiring the necessary files in an included `README.md` file.
+
+Once you have collected these files and reviewed the project rubric, proceed to the project submission page.
+
+### I'm Ready!
+When you're ready to submit your project, click on the **Submit Project** button at the bottom of the [project's page](https://classroom.udacity.com/nanodegrees/nd009t/parts/d029d91a-afbf-4371-8988-5d327eccecbd/modules/46854c06-9b98-464a-b54a-c816b02f8aff/lessons/fdf61d9b-2808-4a47-8b4c-f881c7372f27/project#) on Udacity's website.
+
+If you are having any problems submitting your project or wish to check on the status of your submission, please email us at **machine-support@udacity.com** or visit us in the [discussion forums](http://discussions.udacity.com/).
+
+### What's Next?
+You will get an email as soon as your reviewer has feedback for you. In the meantime, review your next project and feel free to get started on it or the courses supporting it!
