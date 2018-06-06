@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Domain Background}{}% 1
+\BOOKMARK [1][-]{section.2}{Problem Statement}{}% 2
+\BOOKMARK [1][-]{section.3}{Datasets and Inputs}{}% 3
+\BOOKMARK [1][-]{section.4}{Solution Statement}{}% 4
+\BOOKMARK [1][-]{section.5}{Benchmark Model}{}% 5
+\BOOKMARK [1][-]{section.6}{Evaluation Metric}{}% 6
+\BOOKMARK [1][-]{section.7}{Project Design}{}% 7
+\BOOKMARK [1][-]{section*.1}{Appendices}{}% 8
+\BOOKMARK [1][-]{Appendix.1.A}{Data Table Descriptions}{}% 9
+\BOOKMARK [1][-]{Appendix.1.B}{Data Table Features}{}% 10
+\BOOKMARK [2][-]{subsection.1.B.1}{Main Data Table Features \(application\137\173train | test\175.csv\)}{Appendix.1.B}% 11
+\BOOKMARK [2][-]{subsection.1.B.2}{Bureau Data Table Features \(bureau.csv\)}{Appendix.1.B}% 12
+\BOOKMARK [2][-]{subsection.1.B.3}{Bureau Balance Data Table Features \(bureau\137balance.csv\)}{Appendix.1.B}% 13
+\BOOKMARK [2][-]{subsection.1.B.4}{Previous Application Data Table Features \(previous\137application.csv\)}{Appendix.1.B}% 14
+\BOOKMARK [2][-]{subsection.1.B.5}{POS CASH Balance Data Table Feature \(POS\137CASH\137balance.csv\)}{Appendix.1.B}% 15
+\BOOKMARK [2][-]{subsection.1.B.6}{Installments Payments Data Table Features \(installments\137payments.csv\)}{Appendix.1.B}% 16
+\BOOKMARK [2][-]{subsection.1.B.7}{Credit Card Balance Data Table Features \(credit\137card\137balance.csv\)}{Appendix.1.B}% 17

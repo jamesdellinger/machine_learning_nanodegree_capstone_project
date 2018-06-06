@@ -1,0 +1,167 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{ynt/global//global/global}
+    \entry{homecreditwebsite}{online}{}
+      \name{author}{1}{}{%
+        {{hash=b2cb4f23abfc34a03ff7d28a751597ae}{%
+           family={Group},
+           familyi={G\bibinitperiod},
+           given={Home\bibnamedelima Credit},
+           giveni={H\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \strng{namehash}{b2cb4f23abfc34a03ff7d28a751597ae}
+      \strng{fullhash}{b2cb4f23abfc34a03ff7d28a751597ae}
+      \strng{bibnamehash}{b2cb4f23abfc34a03ff7d28a751597ae}
+      \strng{authorbibnamehash}{b2cb4f23abfc34a03ff7d28a751597ae}
+      \strng{authornamehash}{b2cb4f23abfc34a03ff7d28a751597ae}
+      \strng{authorfullhash}{b2cb4f23abfc34a03ff7d28a751597ae}
+      \field{labelalpha}{Gro}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.01.2018)}
+      \field{title}{Home Credit Group Website}
+      \verb{urlraw}
+      \verb http://www.homecredit.net/
+      \endverb
+      \verb{url}
+      \verb http://www.homecredit.net/
+      \endverb
+      \keyw{home,credit,group}
+    \endentry
+    \entry{kagglehomecreditcompetitiondata}{online}{}
+      \name{author}{1}{}{%
+        {{hash=8fec9765921cfa63cb331e42a924c27c}{%
+           family={Kaggle},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{bibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorbibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authornamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \field{labelalpha}{Kag}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{extraalpha}{1}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.01.2018)}
+      \field{title}{Home Credit Default Risk Competition Data}
+      \verb{urlraw}
+      \verb https://www.kaggle.com/c/home-credit-default-risk/data
+      \endverb
+      \verb{url}
+      \verb https://www.kaggle.com/c/home-credit-default-risk/data
+      \endverb
+      \keyw{credit,default,risk,kaggle,competition,data}
+    \endentry
+    \entry{kagglehomecreditcompetitionoverview}{online}{}
+      \name{author}{1}{}{%
+        {{hash=8fec9765921cfa63cb331e42a924c27c}{%
+           family={Kaggle},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{bibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorbibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authornamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \field{labelalpha}{Kag}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.01.2018)}
+      \field{title}{Home Credit Default Risk Competition Overview}
+      \verb{urlraw}
+      \verb https://www.kaggle.com/c/home-credit-default-risk/
+      \endverb
+      \verb{url}
+      \verb https://www.kaggle.com/c/home-credit-default-risk/
+      \endverb
+      \keyw{credit,default,risk,kaggle,competition}
+    \endentry
+    \entry{kagglehomecreditcompetitionpublicleaderboard}{online}{}
+      \name{author}{1}{}{%
+        {{hash=8fec9765921cfa63cb331e42a924c27c}{%
+           family={Kaggle},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{bibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorbibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authornamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \field{labelalpha}{Kag}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{extraalpha}{3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.02.2018)}
+      \field{title}{Home Credit Default Risk Competition Public Leaderboard}
+      \verb{urlraw}
+      \verb https://www.kaggle.com/c/home-credit-default-risk/leaderboard
+      \endverb
+      \verb{url}
+      \verb https://www.kaggle.com/c/home-credit-default-risk/leaderboard
+      \endverb
+      \keyw{credit,default,risk,kaggle,competition,public,leaderboard}
+    \endentry
+    \entry{mlwikirocanalysis}{online}{}
+      \name{author}{1}{}{%
+        {{hash=98ce4732c5db7837526200eda78b2fe1}{%
+           family={Wiki},
+           familyi={W\bibinitperiod},
+           given={ML},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{98ce4732c5db7837526200eda78b2fe1}
+      \strng{fullhash}{98ce4732c5db7837526200eda78b2fe1}
+      \strng{bibnamehash}{98ce4732c5db7837526200eda78b2fe1}
+      \strng{authorbibnamehash}{98ce4732c5db7837526200eda78b2fe1}
+      \strng{authornamehash}{98ce4732c5db7837526200eda78b2fe1}
+      \strng{authorfullhash}{98ce4732c5db7837526200eda78b2fe1}
+      \field{labelalpha}{Wik}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.04.2018)}
+      \field{title}{ML Wiki ROC Analysis}
+      \verb{urlraw}
+      \verb http://mlwiki.org/index.php/ROC_Analysis
+      \endverb
+      \verb{url}
+      \verb http://mlwiki.org/index.php/ROC_Analysis
+      \endverb
+      \keyw{ml,wiki,roc,analysis}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
