@@ -10,13 +10,15 @@ https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/b
 
 ### My capstone project report is here:
 
-
+https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf
 
 ### The code for my competition solution is here:
 
-[ipython notebook](https://github.com/jamesdellinger/machine_learning_nanodegree_boston_housing_project/blob/master/boston_housing.ipynb)
+[ipython notebook](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.ipynb)
 
-[html version](https://github.com/jamesdellinger/machine_learning_nanodegree_boston_housing_project/blob/master/report.html)
+[html version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.html)
+
+### The :
 
 ### The competition's data tables are available here:
 
