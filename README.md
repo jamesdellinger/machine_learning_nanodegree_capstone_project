@@ -18,7 +18,11 @@ https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/b
 
 [html version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.html)
 
-### The :
+### The Python environment requirements are here:
+
+[requirements.txt](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/requirements.txt)
+
+[Anaconda .yml file](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk_competition.yml)
 
 ### The competition's data tables are available here:
 
