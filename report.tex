@@ -50,7 +50,82 @@ sorting=ynt
 \begin{document}
 \maketitle
 
+\section{Definition}
+\subsection{Project Overview}
+I want to live in a world where a second chance is available to anyone who would make a good faith effort to make the most of it. \href{http://www.homecredit.net}{Home Credit Group’s}\cite{homecreditwebsite} goal of providing a safe lending alternative to otherwise financially down-and-out folks is perfectly aligned with this desire of mine.
 
+Home Credit's target demographic contains people who typically have no recourse but to deal with shady characters such as loan sharks when borrowing money. Many of these unbanked individuals are hard-working, well-intentioned folks who, either due to circumstances beyond their control or past mistakes, have fallen through the financial system’s cracks.
+
+Like any mainstream for-profit financial institution, Home Credit maximizes its own returns (in the form of interest payments) when it is able to lend money to as many reliable borrowers as its balance sheet allows. The only catch is that, unlike normal banks, Home Credit needs a way to guage whether a loan applicant is the kind of person who will eventually repay the loan, all without relying on traditional measures of financial reliability like credit score. I believe that machine learning is just the right tool to help Home Credit turn the information that it does have about its loan applicants into sound lending decisions. Indeed, a good machine learning algorithm could enable Home Credit to expand its services to as many more worthy customers.
+
+It was with all this in mind that I decided to participate in the \href{https://www.kaggle.com/c/home-credit-default-risk}{Home Credit Default Risk competition} on Kaggle\cite{kagglehomecreditcompetitionoverview} for my capstone project. The goal of the competition, which is sponsored by Home Credit, is to create an algorithm that accurately predicts the likelihood that an applicant will experience difficulty in repaying their loan.
+
+The competition's dataset was provided by Home Credit Group's data scientists. It contains a wide breadth of personal and financial information belonging to 356,255 individuals who had previously been recipients of loans from Home Credit. These individuals are divided into training and testing sets. The training group contains 307,511 individuals' records. The test group contains 48,744 records. The dataset is anonymized, with each individual represented by their loan ID. Any personally indentifying infomation, such as name, phone number, or address, has been omitted.
+
+The dataset's features range from common characteristics, such as marital status, age, type of housing, region of residence, job type, and education level, to some incredibly niche characteristics, such as how many elevators are in an applicant's apartment building. Home Credit also looks at nitty gritty aspects of applicants' financial backgrounds, including month-by-month payment performance on any loans or credit card balances that the applicant has previously had with Home Credit, as well as the amount and monthly repayment balances of any loans that the applicant may have received from other lenders.
+
+All of these features are spread across seven data tables. The main data table (application_\{train \textbar~test\}.csv) contains 122 features that comprise applicants' personal background information. The other six data tables contain applicants' previous loan and credit card balance payment histories. Detailed descriptions of each data table can be found in Appendix \ref{appendix:datatabledescriptions}. Explanations of all features in each data table are in Appendix \ref{appendix:datatablefeatures}. The following diagram provides a brief summary:
+
+\begin{figure}[ht]
+\includegraphics[width=0.9\textwidth]{homecredit}
+\centering
+\caption{Home Credit Data Table Relationships\cite{kagglehomecreditcompetitiondata}}
+\end{figure}
+
+\subsection{Problem Statement}
+Home Credit needs an algorithm that will take as inputs various personal and financial information originally contained in a loan applicant's profile and structured as features in the seven data tables outlined above. The algorithm will then determine a probability of the applicant eventually making at least one late repayment on their loan. This probability will be in the range [0.0, 1.0], where 1.0 represents a 100\% certainty that the applicant will make at least one late repayment and 0.0 indicates that there is zero chance that the applicant will ever make a late payment. The algorithm will be tested on a set of 48,744 individuals who previously borrowed from Home Credit. Competition participants must submit a CSV file that contains one header row, and 48,744 prediction rows, where each prediction row contains both a user ID, the \colorbox{backcolor}{\textcolor{red}{\texttt{SKI_ID_CURR}}} column, and the probability, the \colorbox{backcolor}{\textcolor{red}{\texttt{TARGET}}} column, of that user being delinquent. The file must be formatted as follows:
+
+\begin{lstlisting}
+SK_ID_CURR,TARGET
+100001,0.1
+100005,0.9
+100013,0.2
+etc.
+\end{lstlisting}
+
+To solve this competition I intend to try out several machine learning algorithms that can also return the probabilities of their classification predictions, such as logistical regression and multi-layer perceptron classifiers. For each classifier I build, I will experiment with tuning hyperparameters both manually and automatically. I will train my algorithms using the 307,511 borrower records that comprise the training segment. However, since this is a Kaggle competition, Home Credit has removed the target data from the test set. This means that in order to guage the performance of the different algorithms I attempt to use, and in order to ensure that I don't overfit to the training data, it is imperative that I set aside a fraction of the training set (around 20\%) to serve as a validation test set. Alternatively, I could employ an algorithm such as K-Fold Cross Validation.
+
+The seven data tables provided by Home Credit contain an awful lot of information that could take months to thoroughly investigate. So for the purposes of this project, I will focus on the features in the main data table. However, I will engineer at least one feature that is based on some portion of the data contained inside the other six tables. Finally, I will experiment with both manual and automatic feature selection.
+
+Once I've finished my experimentation, I will choose the classifier/hyperparameter/feature combination that scores highest on my validation set and submit its test set probability predictions on the Kaggle competition's page. I am looking forward to seeing how my submission performs relative to other entries on the competition's leaderboard.
+
+Home Credit knows which borrowers in the test set made at least one late loan payment, and which ones were never delinquent. The winning algorithm will therefore need to predict the highest probabilities of delinquency for the largest fraction of borrowers who did have at least one late payment, and will need to predict the lowest probabilities of delinquency for the largest fraction of borrowers who never had a late payment. More formally, a winning algorithm will have the highest true positive rate, or sensitivity, (correctly guessing who will be delinquent), while at the same time having a minimum false positive rate (as seldomly as possible making an incorrect guess that an individual would be delinquent).
+
+\subsection{Metrics}
+The area under the ROC (receiver operating characteristic) curve\cite{wikipediaroc} will be the evaluation metric for my solution to this competition. This area can range from a minimum value of 0, or 0\%, to a maximum of 1, or 100\%. The size of the area under an ROC curve indicates how good a job a classifier does of identifying, or separating out, a particular target segment from a dataset. An area of 1 indicates that the classifier is perfect -- that it can find every true positive (exhibiting perfect sensitivity, or recall) without making any mistakes (not accidentally labelling some true negatives as false positives), thus giving it perfect specificity, which leads to a false positive rate (1 - specificity), of zero. An area of 0 indicates that the classifier isn't able to find and properly label any of the true positives. An area of 0.5 is the level of performance we'd expect from a classifier that randomly labels each point in the dataset -- on the whole, this classifier would make just as many mistakes (false positives) as it makes correct predictions (true positives).
+
+\begin{figure}[ht]
+\includegraphics[width=0.5\textwidth]{roccurves}
+\centering
+\caption{ROC Curve Examples\cite{mlwikirocanalysis}}
+\end{figure}
+
+Because the goal of this competition is to create an algorithm that correctly identifies the target segment of loan applicants who will be delinquent in repaying their loans, the area under the ROC curve is a perfectly appropriate measure of my algorithm's performance. At a bare minimum, my classifier must achieve a score of better than 0.5 -- anything less would mean that my classifier performs only as good as, or worse than, a random classifier. A competition-winning solution will be the algorithm that has an area under its ROC curve that is closest to 1. This algorithm will naturally be able to correctly predict more delinquent repayers than the other submissions (maximizing the true positive rate), while at the same time making the fewest incorrect predictions about which applicants are delinquent repayers (minimizing the false positive rate).
+
+\section{Analysis}
+\subsection{Data Exploration}
+
+
+\subsection{Exploratory Visualization}
+\subsection{Algorithms and Techniques}
+\subsection{Benchmark}
+Since Kaggle ranks submissions to this competition by the area under the ROC curve between their predicted proabilities of delinquency and the actual observed targets (whether or not the borrower did make at least one late payment), an ideal benchmark would be the area under ROC curve of the prediction model employed by Home Credit's data scientists prior to this competition's debut on Kaggle.
+
+However, since Home Credit possibly considers the specifics of this model and its ROC curve area to be proprietary information, it is understandable that this score has not been disclosed. As a next best alternative, I will use as a benchmark the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score. The reader may refer to the file \colorbox{backcolor}{\textcolor{red}{\texttt{home-credit-default-risk-publicleaderboard(6-02-2018).csv}}}, located inside this project's Github repository\cite{githubprojectrepo}, to verify my calculation of this benchmark.
+
+\section{Methodology}
+\subsection{Data Preprocessing}
+\subsection{Implementation}
+\subsection{Refinement}
+
+\section{Results}
+\subsection{Model Evaluation and Validation}
+\subsection{Justification}
+
+\section{Conclusion}
+\subsection{Free-Form Visualization}
+\subsection{Reflection}
+\subsection{Improvement}
 
 \begin{appendices}
 \section{Data Table Descriptions}

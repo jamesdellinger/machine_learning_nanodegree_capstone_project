@@ -1,15 +1,15 @@
 [0] Config.pm:302> INFO - This is Biber 2.11
 [0] Config.pm:305> INFO - Logfile is 'report.blg'
-[36] biber-darwin:313> INFO - === Wed Jun  6, 2018, 12:44:41
+[37] biber-darwin:313> INFO - === Thu Jun  7, 2018, 18:35:49
 [59] Biber.pm:371> INFO - Reading 'report.bcf'
-[151] Biber.pm:857> INFO - Found 1 citekeys in bib section 0
-[168] Biber.pm:3976> INFO - Processing section 0
-[180] Biber.pm:4136> INFO - Looking for bibtex format file 'capstone.bib' for section 0
-[181] bibtex.pm:1500> INFO - LaTeX decoding ...
-[187] bibtex.pm:1316> INFO - Found BibTeX data source 'capstone.bib'
-[203] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[203] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[203] Biber.pm:3804> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
-[203] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
-[210] bbl.pm:617> INFO - Writing 'report.bbl' with encoding 'UTF-8'
-[211] bbl.pm:720> INFO - Output to report.bbl
+[154] Biber.pm:857> INFO - Found 7 citekeys in bib section 0
+[169] Biber.pm:3976> INFO - Processing section 0
+[182] Biber.pm:4136> INFO - Looking for bibtex format file 'capstone.bib' for section 0
+[183] bibtex.pm:1500> INFO - LaTeX decoding ...
+[193] bibtex.pm:1316> INFO - Found BibTeX data source 'capstone.bib'
+[241] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[241] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[241] Biber.pm:3804> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
+[242] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
+[254] bbl.pm:617> INFO - Writing 'report.bbl' with encoding 'UTF-8'
+[257] bbl.pm:720> INFO - Output to report.bbl
