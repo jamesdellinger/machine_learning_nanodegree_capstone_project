@@ -1,11 +1,11 @@
 # Fdb version 3
-["biber proposal"] 1528419564 "proposal.bcf" "proposal.bbl" "proposal" 1528419572
-  "capstone.bib" 1528419563 1668 ec93744be23986411633a8ecbc08206f ""
-  "proposal.bcf" 1528419567 90922 35566304260ae8d40c9c1b28177cad37 ""
+["biber proposal"] 1529360343 "proposal.bcf" "proposal.bbl" "proposal" 1529360347
+  "capstone.bib" 1528421743 1980 ef2f2106e21063d3f07ce1db32afdde3 ""
+  "proposal.bcf" 1529360347 90922 35566304260ae8d40c9c1b28177cad37 ""
   (generated)
-  "proposal.blg"
   "proposal.bbl"
-["pdflatex"] 1528419566 "proposal.tex" "proposal.pdf" "proposal" 1528419572
+  "proposal.blg"
+["pdflatex"] 1529360346 "proposal.tex" "proposal.pdf" "proposal" 1529360347
   "/usr/local/texlive/2018/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/local/texlive/2018/texmf-dist/fonts/tfm/public/cm/cmbsy10.tfm" 1480098701 1116 4e6ba9d7914baa6482fd69f67d126380 ""
   "/usr/local/texlive/2018/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1480098701 1324 c910af8c371558dc20f2d7822f66fe64 ""
@@ -95,15 +95,15 @@
   "/usr/local/texlive/2018/texmf.cnf" 1523934483 577 0b39adfd7c93507ff20c9c14c2f1a33f ""
   "images/homecredit.png" 1527805359 66899 b3ab919634cc220c81083d6893881fae ""
   "images/roccurves.png" 1528134932 13402 938f850f800bb2984ba620194869cd2c ""
-  "proposal.aux" 1528419567 5739 44ced8255a59024913b1d0d1ac480242 ""
-  "proposal.bbl" 1528419565 7611 c6c47f4f1aecd99165e71f693615a1f5 "biber proposal"
-  "proposal.out" 1528419567 1366 eb936f810a2a23eb529589642dcdde85 ""
-  "proposal.run.xml" 1528419567 2337 227bfab9456ee9739bda8ead30e69ecb ""
-  "proposal.tex" 1528419559 57277 4b18b9713ad1c6bf8c55b5c15f214800 ""
+  "proposal.aux" 1529360347 5742 3e9f95891dca8cdeb9e859942a6741f6 ""
+  "proposal.bbl" 1529360345 7611 c6c47f4f1aecd99165e71f693615a1f5 "biber proposal"
+  "proposal.out" 1529360347 1367 302cbd526dd19cfe7791fce3ebba64db ""
+  "proposal.run.xml" 1529360347 2337 227bfab9456ee9739bda8ead30e69ecb ""
+  "proposal.tex" 1529349397 58089 4740515c631d7d2363e102ad01d5c354 ""
   (generated)
-  "proposal.bcf"
+  "proposal.aux"
+  "proposal.pdf"
   "proposal.run.xml"
   "proposal.out"
-  "proposal.aux"
+  "proposal.bcf"
   "proposal.log"
-  "proposal.pdf"

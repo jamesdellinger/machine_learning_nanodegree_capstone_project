@@ -76,7 +76,7 @@ This competition's dataset was provided by Home Credit Group's data scientists. 
 
 Because Home Credit targets the unbanked population, it is unable to rely on traditional measures, such as a credit score, that mainstream financial institutions use when making lending decisions. Home Credit works around this obstacle by looking at an extensive and diverse array of personal and financial information for each of its applicants. These features range from common characteristics, such as marital status, age, type of housing, region of residence, job type, and education level, to some incredibly niche characteristics, such as how many elevators are in an applicant's apartment building. Home Credit also looks at nitty gritty aspects of applicants' financial backgrounds, including month-by-month payment performance on any loans or credit card balances that the applicant has previously had with Home Credit, as well as the amount and monthly repayment balances of any loans that the applicant may have received from other lenders.
 
-All of these features are spread across seven data tables. The main data table (application_\{train \textbar~test\}.csv) contains 122 features that comprise applicants' personal background information. The other six data tables contain applicants' previous loan and credit card balance payment histories. Detailed descriptions of each data table can be found in Appendix \ref{appendix:datatabledescriptions}. Explanations of all features in each data table are in Appendix \ref{appendix:datatablefeatures}. The following diagram provides a brief summary:
+All of these features are spread across seven data tables. The main data table (application_\{train \textbar~test\}.csv) contains 120 features that comprise applicants' personal background information. The other six data tables contain applicants' previous loan and credit card balance payment histories. Detailed descriptions of each data table can be found in Appendix \ref{appendix:datatabledescriptions}. Explanations of all features in each data table are in Appendix \ref{appendix:datatablefeatures}. The following diagram provides a brief summary:
 
 \begin{figure}[ht]
 \includegraphics[width=0.9\textwidth]{homecredit}
@@ -112,19 +112,20 @@ Although Home Credit provides seven data tables for this competition, for the pu
       \item Display number of entries (rows) in each data table.
       \item Display number of features in each data table.
       \item Generate and display 5-row samples of each data table.
-      \item Generate and display statistical descriptions of the numerical features of each data table.
+      \item Generate and display statistical descriptions of the numerical features of each data table that will be used by my algorithm.
       \item Investigate whether any features in any of the data tables have "NaN" entries that will need to be handled, and whether some features have sparse enough data such that the entire feature should be removed.
       \item Also investigate whether any borrowers (rows) in the main data table have 'NaN' for the majority of their feature entries. Some of these datapoints may also need to be removed.
-      \item Review the statistical descriptions of each numerical feature and ensure that there are no other unexpected forms of numerical data. eg. a feature having some negative numbers among its entries, where only positive numbers would be expected.
-      \item List the features in the main data table that will need to be one-hot encoded.
-      \item List the features in the main data table that are not already identified as being normally distributed.
-      \item Brainstorm at least three features that could be engineered from the data contained in the other six data tables outside of the main data table.
+      \item Review the statistical descriptions of each numerical feature, and ensure that there are no other unexpected numerical entries in these features, eg. a feature having some negative numbers among its entries, where only positive numbers would be expected based on how the feature was defined by Home Credit.
+      \item List the numerical features in the main data table that are not already identified as being normally distributed (they may eventually need to be log-normalized).
+      \item List the categorical features in the main data table that will need to be one-hot encoded.
+      \item List the categorical features in the data table that are already one-hot encoded.
+      \item Define at least one feature that could be engineered from the data contained in the other six data tables outside of the main data table.
     \end{enumerate}
   \item \textbf{Exploratory Visualization}
     \begin{enumerate}
-      \item Plot feature pair scatterplots of all features in the main data table using sns.PairGrid, in order to see if any feature pairs contain a decent separation between the two target segments (delinquent repayers vs. on-time repayers), and if so, whether the separation follows a particular geometrical pattern.
-      \item Plot a scatter matrix of each numerical feature in the main data table, in order to find features that exhibit no correlation with any of the other features (these kinds features may also be more useful in segmenting the data points).
       \item Plot histograms of the numerical features in the main data table, in order to confirm which ones are indeed already normally distributed.
+      \item Plot histograms of the numerical features in the main data table that are supposedly not already normally distributed.
+      \item Identify any outliers that will need to be addressed.
     \end{enumerate}
   \item \textbf{Algorithms and Techniques to Consider}
     \begin{enumerate}
@@ -134,7 +135,7 @@ Although Home Credit provides seven data tables for this competition, for the pu
           \item Dimensionality reduction using Sparse Random Projection (in case using PCA is too taxing on my compute resources)
         \end{enumerate}
         Note: Many of the features may well be correlated with each other, and thus not independent, so I cannot use a dimensionality reduction algorithm that assumes feature independence, such as Independent Component Analysis (ICA).
-      \item \textbf{Classification and Clustering Algorithms}:
+      \item \textbf{Learning Algorithms}:
 
       Any algorithm that I use will need to not only be able to simply segment the data points into the ``delinquent repayers" and ``on-time repayers" categories, but must also be able to compute the probability that each data point in the test set belongs to the ``delinquent repayers" segment. These probabilities will naturally be higher for points that the algorithm labels as ``delinquent repayers," and will be lower for the points that are labeled as ``on-time repayers." This requirement automatically eliminates algorithms such as SVM, K-Means, Hierarchical Clustering from consideration.
 
@@ -176,8 +177,7 @@ Although Home Credit provides seven data tables for this competition, for the pu
       \item Apply one-hot encoding to all non-numerical features in the main data table.
       \item Separate out training and testing target data into their own variables. Drop the targets column from both training and testing sets of the main data table.
       \item Apply non-linear feature scaling using the natural logarithm to any numerical features in the main data table that aren't already normally distributed.
-      \item Use sklearn.preprocessing.normalize() to apply normalized feature scaling to the newly normalized numerical features in the main data table.
-      \item Use Tukey's method to identify outliers among the different numerical features in the training set of the main data table. Decide which, if any, data points containing outliers will be removed from the main data table.
+      \item Ensure all numerical features are scaled to the range [0.0,1.0]
       \item \textbf{Engineer} at least one feature based on some of the data contained in the six other data tables and append it to the main data table.
     \end{enumerate}
   \item \textbf{Implementation}
@@ -381,7 +381,7 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
 \subsection{Bureau Data Table Features (bureau.csv)}
 \begin{enumerate}
   \item \textbf{SK_ID_CURR}: ID of loan in our sample - one loan in our sample can have 0,1,2 or more related previous credits in credit bureau -- hashed
-  \item \textbf{SK_BUREAU_ID}: Recoded ID of previous Credit Bureau credit related to our loan (unique coding for each loan application) -- hashed
+  \item \textbf{SK_ID_BUREAU}: Recoded ID of previous Credit Bureau credit related to our loan (unique coding for each loan application) -- hashed
   \item \textbf{CREDIT_ACTIVE}: Status of the Credit Bureau (CB) reported credits
   \item \textbf{CREDIT_CURRENCY}: Recoded currency of the Credit Bureau credit -- recoded
   \item \textbf{DAYS_CREDIT}: How many days before current application did client apply for Credit Bureau credit -- time only relative to the application
@@ -401,7 +401,7 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
 
 \subsection{Bureau Balance Data Table Features (bureau_balance.csv)}
 \begin{enumerate}
-  \item \textbf{SK_BUREAU_ID}: Recoded ID of Credit Bureau credit (unique coding for each application) - use this to join to CREDIT_BUREAU table -- hashed
+  \item \textbf{SK_ID_BUREAU}: Recoded ID of Credit Bureau credit (unique coding for each application) - use this to join to CREDIT_BUREAU table -- hashed
   \item \textbf{MONTHS_BALANCE}: Month of balance relative to application date (-1 means the freshest balance date) -- time only relative to the application
   \item \textbf{STATUS}: Status of Credit Bureau loan during the month (active, closed, DPD0-30,Ö [C means closed, X means status unknown, 0 means no DPD, 1 means maximal did during month between 1-30, 2 means DPD 31-60,Ö 5 means DPD 120+ or sold or written off ])
 \end{enumerate}
@@ -447,7 +447,7 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
   \item \textbf{NFLAG_INSURED_ON_APPROVAL}: Did the client requested insurance during the previous application
 \end{enumerate}
 
-\subsection{POS CASH Balance Data Table Feature (POS_CASH_balance.csv)}
+\subsection{POS CASH Balance Data Table Features (POS_CASH_balance.csv)}
 \begin{enumerate}
   \item \textbf{SK_ID_PREV}: ID of previous credit in Home Credit related to loan in our sample. (One loan in our sample can have 0,1,2 or more previous loans in Home Credit)
   \item \textbf{SK_ID_CURR}: ID of loan in our sample

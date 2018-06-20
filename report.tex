@@ -10,6 +10,14 @@
 \usepackage{underscore}
 \usepackage{csquotes}
 \usepackage{graphicx}
+\usepackage{longtable}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+% Create custom table column type that is right-aligned
+% and name it R. Useful for setting column alignment
+% and width in a long table.
+\newcolumntype{R}{>{\raggedleft\arraybackslash}}
 
 \graphicspath{ {./images/} }
 \DeclareGraphicsExtensions{.png,.pdf}
@@ -45,7 +53,7 @@ sorting=ynt
 
 \title{Capstone Project Report\\[8pt]
 \normalsize{Udacity Machine Learning Nanodegree}}
-\date{June 6, 2018}
+\date{June 15, 2018}
 \author{James Dellinger}
 \begin{document}
 \maketitle
@@ -60,11 +68,11 @@ Like any mainstream for-profit financial institution, Home Credit maximizes its 
 
 It was with all this in mind that I decided to participate in the \href{https://www.kaggle.com/c/home-credit-default-risk}{Home Credit Default Risk competition} on Kaggle\cite{kagglehomecreditcompetitionoverview} for my capstone project. The goal of the competition, which is sponsored by Home Credit, is to create an algorithm that accurately predicts the likelihood that an applicant will experience difficulty in repaying their loan.
 
-The competition's dataset was provided by Home Credit Group's data scientists. It contains a wide breadth of personal and financial information belonging to 356,255 individuals who had previously been recipients of loans from Home Credit. These individuals are divided into training and testing sets. The training group contains 307,511 individuals' records. The test group contains 48,744 records. The dataset is anonymized, with each individual represented by their loan ID. Any personally indentifying infomation, such as name, phone number, or address, has been omitted.
+The competition's dataset was provided by Home Credit Group's data scientists. It contains a wide breadth of personal and financial information belonging to 356,255 individuals who had previously been recipients of loans from Home Credit. In this report I use the words borrower and applicant interchangeably to refer to these individuals. These individuals are divided into training and testing sets. The training group contains 307,511 individuals' records. The test group contains 48,744 records. The dataset is anonymized, with each individual represented by their loan ID. Any personally indentifying infomation, such as name, phone number, or address, has been omitted.
 
 The dataset's features range from common characteristics, such as marital status, age, type of housing, region of residence, job type, and education level, to some incredibly niche characteristics, such as how many elevators are in an applicant's apartment building. Home Credit also looks at nitty gritty aspects of applicants' financial backgrounds, including month-by-month payment performance on any loans or credit card balances that the applicant has previously had with Home Credit, as well as the amount and monthly repayment balances of any loans that the applicant may have received from other lenders.
 
-All of these features are spread across seven data tables. The main data table (application_\{train \textbar~test\}.csv) contains 122 features that comprise applicants' personal background information. The other six data tables contain applicants' previous loan and credit card balance payment histories. Detailed descriptions of each data table can be found in Appendix \ref{appendix:datatabledescriptions}. Explanations of all features in each data table are in Appendix \ref{appendix:datatablefeatures}. The following diagram provides a brief summary:
+All of these features are spread across seven data tables. The main data table (\colorbox{backcolor}{\textcolor{black}{\texttt{application_\{train \textbar~test\}.csv}}}) contains 120 features that comprise applicants' personal background information. The other six data tables contain applicants' previous loan and credit card balance payment histories. Detailed descriptions of each data table can be found in Appendix \ref{appendix:datatabledescriptions}. Explanations of all features in each data table are in Appendix \ref{appendix:datatablefeatures}. The following diagram provides a brief summary:
 
 \begin{figure}[ht]
 \includegraphics[width=0.9\textwidth]{homecredit}
@@ -73,7 +81,7 @@ All of these features are spread across seven data tables. The main data table (
 \end{figure}
 
 \subsection{Problem Statement}
-Home Credit needs an algorithm that will take as inputs various personal and financial information originally contained in a loan applicant's profile and structured as features in the seven data tables outlined above. The algorithm will then determine a probability of the applicant eventually making at least one late repayment on their loan. This probability will be in the range [0.0, 1.0], where 1.0 represents a 100\% certainty that the applicant will make at least one late repayment and 0.0 indicates that there is zero chance that the applicant will ever make a late payment. The algorithm will be tested on a set of 48,744 individuals who previously borrowed from Home Credit. Competition participants must submit a CSV file that contains one header row, and 48,744 prediction rows, where each prediction row contains both a user ID, the \colorbox{backcolor}{\textcolor{red}{\texttt{SKI_ID_CURR}}} column, and the probability, the \colorbox{backcolor}{\textcolor{red}{\texttt{TARGET}}} column, of that user being delinquent. The file must be formatted as follows:
+Home Credit needs an algorithm that will take as inputs various personal and financial information originally contained in a loan applicant's profile and structured as features in the seven data tables outlined above. The algorithm will then determine a probability of the applicant eventually making at least one late repayment on their loan. This probability will be in the range [0.0, 1.0], where 1.0 represents a 100\% certainty that the applicant will make at least one late repayment and 0.0 indicates that there is zero chance that the applicant will ever make a late payment. The algorithm will be tested on a set of 48,744 individuals who previously borrowed from Home Credit. Competition participants must submit a CSV file that contains one header row, and 48,744 prediction rows, where each prediction row contains both a user ID, the \colorbox{backcolor}{\textcolor{black}{\texttt{SKI_ID_CURR}}} column, and the probability, the \colorbox{backcolor}{\textcolor{black}{\texttt{TARGET}}} column, of that user being delinquent. The file must be formatted as follows:
 
 \begin{lstlisting}
 SK_ID_CURR,TARGET
@@ -104,14 +112,229 @@ Because the goal of this competition is to create an algorithm that correctly id
 
 \section{Analysis}
 \subsection{Data Exploration}
+\subsubsection{Data Table Statistics and Samples}
+For this project I will make use of both the main data table (\colorbox{backcolor}{\textcolor{black}{\texttt{application_\{train \textbar~test\}.csv}}}) and the bureau data table (\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}). The main data table's training segment (\colorbox{backcolor}{\textcolor{black}{\texttt{application_train.csv}}}) contains 307,511 rows, each representing a unique individual who has previously borrowed money from Home Credit. The main data table contains 122 columns. The first two columns, \colorbox{backcolor}{\textcolor{black}{\texttt{SKI_ID_CURR}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{TARGET}}}, represent a borrower's loan ID and target value, respectively. The loan ID is a unique identifier assigned to each borrower. A target value of 1 indicates that the borrower eventually made at least one late loan payment. A target value of 0 indicates that the borrower always paid on time. The remaining 120 columns contain features that encapsulate various information from a borrower's loan application profile. Features are both categorical and numerical. Some categorical features, such as gender (\colorbox{backcolor}{\textcolor{black}{\texttt{CODE_GENDER}}}), have not yet been one-hot encoded. Other categorical features, like whether or not the applicant submitted a mobile phone number (\colorbox{backcolor}{\textcolor{black}{\texttt{FLAG_MOBIL}}}), have been one-hot encoded. Some numerical features have been normalized and others have not. Most of the normalized features, such as the average number of entrances (\colorbox{backcolor}{\textcolor{black}{\texttt{ENTRANCES_AVG}}}), represent data about the applicant's building of residence. Non-normalized features often encapsulate general data on an applicant's employment and financial background, such as the number of days the applicant has had a job (\colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}). Summary statistics of each numerical and previously one-hot encoded categorical feature in the main data table's training set can be viewed in Appendix \ref{appendix:maindatatablestatsummary}. Samples of the first five entries for each of the features can be seen in Appendix \ref{appendix:maindatatablesamples}. Of the 307,511 applicants in the training segment, 282,686 people have a target value of 0 and 24,825 have a target value of 1. This means that roughly 8\% borrowers in the training set have made at least one late loan payment.
 
+The main data table's testing segment (\colorbox{backcolor}{\textcolor{black}{\texttt{application_test.csv}}}) is identical in structure to \colorbox{backcolor}{\textcolor{black}{\texttt{application_train.csv}}}, save for the fact that the target information for the 48,744 borrowers in this segment has been removed. I will use my final, validated learning algorithm to predict target values for the borrowers contained in this data table, and then submit these predictions on Kaggle.
+
+The bureau data table (\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}) contains summary information of applicants' loans from other lenders, such as the amount and type of loan, as well as overdue repayment balance. Each row represents a unique loan. Many individual applicants have several rows in the bureau data table, where each row represents a different loan belonging to the same applicant. I will later engineer a feature based on the features contained in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}. Appendix \ref{appendix:bureaudatatablestatsummary} contains statistical summaries of the numerical features in the bureau data table. Appendix \ref{appendix:bureaudatatablesamples} contains samples of the first five entries of all features.
+
+\subsubsection{Main Data Table Features with `NaN' Entries}
+The defining characteristic of the main data table is the prevalence of `NaN' entries. Over 67 of the 120 total features have one or more entries of `NaN'. Several of these features, especially ones containing numerical information on a borrower's residence building such as \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}} and
+\colorbox{backcolor}{\textcolor{black}{\texttt{NONLIVINGAPARTMENTS_AVG}}}, have nearly 70\% of their entries as `NaN'. Three questions drove my investigation of these 67 features:
+
+\begin{enumerate}
+  \item Might merely having `NaN' for a feature help predict a borrower's target value?
+  \item Will features with numerous `NaN' entries even be useful at all?
+  \item Do `NaN' values primarily belong to numerical features, categorical features, or both?
+\end{enumerate}
+
+\paragraph{Question 1:}
+I confirmed that for all 67 features, a borrower simply having an `NaN' entry for a feature will not help predict whether the borrower will be more or less likely to be delinquent. I verified this by looking at the fractions of each feature's `NaN' and non-`NaN' cohorts that had a target value of 1. For each feature, I found that the fraction of `NaN' borrowers who were delinquent payers was identical to the fraction of non-`NaN' borrowers who were delinquent. If just having `NaN' for a particular feature were to have any chance of being a meaningful predictor of delinquency, I would have expected these two proportions to have had a stastically significant difference. Statistics summarizing `NaN' values for each feature can be viewed in Appendix \ref{appendix:maindatatablenanstatsummary}.
+
+\paragraph{Question 2:}
+It's helpful to remember that there are 24,825 borrowers in the training dataset who had a target value of 1. Any feature that I retain in spite of its `NaN' entries needs to have a large enough amount of non-'NaN' entries that belong to delinquent repayers. If the training set's delinquent population is not adequately represented among a particular feature's valid data points, it's unlikely that a prediction algorithm trained on this feature would generalize well to unseen datapoints. The effective size of the feature's training set would be too small, and the model would be at risk of underfitting.
+
+However, what should the cutoff line be? What fraction of the 24,825 delinquent borrowers need to be represented by a feature's valid data points in order for the feature to be useful for making predictions? There is no general rule of thumb, but the short answer is that it depends -- on many factors such as the distribution of the feature's valid data, as well as the type of learning algorithm I'm using.
+
+Thus for the time being I decided not to remove any of these features -- even features like \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}} that contain `NaN' in over two-thirds of their entries. Instead of running detailed statistical analyses on these features' distributions, I will instead experiment with dimensionality reduction algorithms such as PCA and/or feature selection algorithms such as SelectKBest.
+
+If a feature had 95\% of its entries as `NaN', I would have removed it from the dataset at this point. However, since the sparsest features in the main data table still have valid data in just over 30\% of their entries, I don't want to prematurely remove a feature that may have a chance, however remote, of contributing to useful predictions.
+
+\paragraph{Question 3:}
+I found that all but one of the 46 normalized numerical features contain `NaN' values. About half of the 21 non-normalized numerical features contain `NaN' entries. Only three out of the 15 categorical features that will need to be one-hot encoded contain `NaN' entries. None of the already one-hot encoded categorical features contain `NaN' entries. See Appendix \ref{appendix:maindatatablefeaturetypes}.
+
+\subsubsection{Main Data Table Borrowers with `NaN' Entries}
+I investigated whether any borrowers had `NaN' entries for nearly all of their feature data -- could any borrowers be removed from the training set because their feature data is too sparse?
+
+\begin{figure}[ht]
+\includegraphics[width=0.7\textwidth]{borrowersnandata}
+\centering
+\caption{Borrowers Missing Main Data Table Features}
+\end{figure}
+
+The above plot confirms that no borrowers are missing data for so many features such that they'd be considered outliers. At it is, a borrower could at most be missing roughly only half of the main data table's 120 features. Just under 20,000 of the training dataset's 307,511 borrower records face this "worst-case" scenario. A borrower would have to be missing over 100 features, or at least five-sixths of the main data table featureset, before I would removing them.
+
+\subsubsection{Main Data Table Anomalies}
+I explored data samples\ref{appendix:maindatatablesamples} and statistical descriptions\ref{appendix:maindatatablestatsummary} of the main data table to ensure that no features contained unexpected values that fall outside the range one would expect based on the feature's definition. Examples of unexpected values include entries that are impossibly small/large, or values that are negative when only positive values would be expected.I came across the following five anomalies.
+
+\paragraph{Anomaly 1:}
+The five numerical features, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_BIRTH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_REGISTRATION}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_ID_PUBLISH}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_LAST_PHONE_CHANGE}}}, indicate the number of days prior to the loan application's submission that a particular event took place. For example, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_LAST_PHONE_CHANGE}}} is defined by Home Credit as being the number of days before their loan application that the applicant last changed their phone number.
+
+Values for the above five features are negative, which is expected since each value represents a point in time prior to the time of the loan application's submission, which Home Credit defines as time 0.
+
+What's unexpected is that the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} feature (the number of days an applicant has had a job prior to submitting their application) has a maximum value that is both a \textit{positive} number as well as \textit{unbelievably large}. This maximum value is 365,243 days, or just over 1,000 years!
+
+No human being lives for 1,000 years, let alone holds a job for that long, so this entry clearly indicates a mistake or a special case. What wasn't clear to me was whether \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} contains only one, a few, or several similar entries. Inspecting a histogram of this feature's data should help me answer this question. My intuition tells me that all things being equal, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} could be useful in predicting borrowers' target values, if I can figure out how to handle these outliers.
+
+\paragraph{Anomaly 2:}
+I was undecided whether the features \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}}, the age of the applicant's car,  \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}}, the hour the loan application was submitted, \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}}, the number of children that the applicant has, and \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}}, the size of the applicant's family, should be thought of as categorical or numerical.
+
+This was because the entries for each feature are rounded to whole numbers and their ranges are quite small: [0,23] for \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}}, [0.0,91.0] for \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}}, [0.0,19.0] for \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}}, and [1.0,20.0] for \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}}.
+
+I noticed that other categorical features in the main data table, such as whether the applicant owns a car, or the applicant's housing type, each have distinct entries that encapsulate wildly different meanings. The condition of owning a car, for example, is very different from the condition of not owning a car. After thinking along these lines, it was easy for me to see that neither the entries in \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} nor those \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}} are necessarily always that different from one another in meaning or implication. Is submitting a loan application at 3PM really that different from submitting at 4PM? It is far more likely that there are meaningful sub-ranges, such as the afternoon hours of 1PM to 5PM, that may be helpful in predicting a borrower's target value. It's best to treat these two features as numerical in order to discover the most meaningful sub-ranges.
+
+Things are different for the \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} features. Although the most children any loan applicant had was 19, at least 75\% of all applicants had either zero children or just one child. I decided that it makes most sense to treat  \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} as a categorical feature, and re-engineer it to segment the borrower population into the following two categories: having no children, and having one or more children. Although I expect there will groups of borrowers of diminishing size that have 2,3,4,...,19 children, my hypothesis is that having no children versus having at least one child will be the information most useful to predict target values for the overall population of borrowers. Even if I were to spend time investigating the effects of having 2 vs. 3 vs. 4 vs. ... vs. 19 children, I know that my findings would apply to less than 25\% of the overall population and any predictions informed by these effects likely wouldn't generalize well to unseen datapoints.
+
+For \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}}, the situation is somewhat similar. 25\% of borrowers in the training set have a family size of just one, 50\% have a family of two or less, and 75\% of borrowers have families of 3 people or less. I plan to re-engineer this feature to categorically segment borrowers into the following three groups: having a family size of one, a family size of two, and having a family that's three people or larger.
+
+\paragraph{Anomaly 3:}
+While most features reported as being normalized have a max value of 1.0 and a min value of 0.0. The features \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}} all have values within the range (0.0, 1.0), none of them have maximums of 1.0, nor minimums of 0.0. Because of this discrepancy I will pay special attention to the graphs of these features' distributions when conducting my exploratory data visualization.
+
+\paragraph{Anomaly 4:}
+The feature \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}} is unique in that while it is identified as normalized, its values only fall into the range [0.000290, 0.072508]. All other normalized features were scaled to the range [0.0,1.0]. It's a given that I'll need to scale this feature to [0.0,1.0] during data preprocessing.
+
+\paragraph{Anomaly 5:}
+The five features \colorbox{backcolor}{\textcolor{black}{\texttt{FONDKAPREMONT_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{HOUSETYPE_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{TOTALAREA_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{WALLSMATERIAL_MODE}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{EMERGENCYSTATE_MODE}}} were described by Home Credit as normalized. However, I found that each of these five features was in fact categorical, and would need to be one-hot encoded. \colorbox{backcolor}{\textcolor{black}{\texttt{WALLSMATERIAL_MODE}}}, for example, contains entries such as ``Stone, brick", ``panel", and ``block" that indicate the material(s) of which the walls in the borrower's house are built.
+
+\subsubsection{Feature Engineering}
+Of the six tables in the dataset aside from the main data table, four tables (\colorbox{backcolor}{\textcolor{black}{\texttt{previous_application.csv}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{POS_CASH_balance.csv}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{installments_payments.csv}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{credit_card_balance.csv}}}) contain information pertaining to previous applications and payback histories on prior loans that an applicant has had with Home Credit.
+
+\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}, on the other hand, contains summary information of applicants' loans from \textit{other} lenders, such as the amount and type of loan, and any repayment balance that's overdue\ref{bureaudatatablefeatures}. \colorbox{backcolor}{\textcolor{black}{\texttt{bureau_balance.csv}}} contains month-by-month statuses for each loan recorded in bureau.csv that indicate whether a particular month's balance payment was received and processed\ref{bureaubalancedatatablefeatures}.
+
+My hypothesis is that it will be most useful to engineer a feature that contains information about applicants' most recent payment performance on loans received from lenders other than Home Credit. The \colorbox{backcolor}{\textcolor{black}{\texttt{CREDIT_DAY_OVERDUE}}} feature in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}} gives the number of days that an individual's loan's payments have been overdue.
+
+For simplicity's sake, my engineered feature will be built on \colorbox{backcolor}{\textcolor{black}{\texttt{CREDIT_DAY_OVERDUE}}}, and will indicate whether or not a Home Credit applicant currently has overdue loan payments from other creditors.
+
+My engineered feature will be titled \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CREDIT_BUREAU_LOANS_OVERDUE}}}. If a Home Credit applicant has at least one loan in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}} for which \colorbox{backcolor}{\textcolor{black}{\texttt{CREDIT_DAY_OVERDUE}}} has a value greater than 0, the value of my new feature applicant will be 1. Otherwise, the value will be 0. Once the feature has been created, I will append it to the main data table.
 
 \subsection{Exploratory Visualization}
+\subsubsection{Distributions of Main Data Table Numerical Features Identified as Normalized}
+I plotted distributions of 46 numerical features that Home Credit had identified as normalized. I ignored all `NaN' entries. All 46 plots can be viewed in Appendix \ref{normalfeaturedistibs}. I paid special attention to the distributions of four features I had found anomalous while exploring the dataset: \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}}.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{distribsEXTSOURCE1EXTSOURCE2EXTSOURCE3}
+\centering
+\caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}}}
+\end{figure}
+
+It turned out that \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}} were the three features I should have been least concerned about. The shapes of these features' distributions more closely a the normal bell curve than all other normalized numerical features. And perhaps this shouldn't have been so surprising. According to Home Credit's definitions, these three features represent normalized scores that came from an "external data source," and I can only surmise that whatever methodology the external source used to define and assign these scores may be what results in their values being more normally distributed across the training dataset.
+
+\begin{figure}[ht]
+\includegraphics[width=0.7\textwidth]{distribREGIONPOPULATIONRELATIVE}
+\centering
+\caption{Distribution of Feature \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}}}
+\end{figure}
+
+The feature \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}} does indeed have all its values within an approximate range of [0.00,0.07]. There is nothing in the feature's definition that suggests why, out of all the other normalized features, this is the only feature not scaled to the range [0.0,1.0]. Thankfully, this feature exhibits minimal positive or negative skewness. The only preprocessing necessary is scale this feature to the range [0.0,1.0].
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{distribsYEARSBUILDAVGFLOORSMINMODEFLOORSMAXAVG}
+\centering
+\caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{YEARS_BUILD_AVG}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{FLOORSMIN_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{FLOORSMAX_AVG}}}}
+\end{figure}
+
+Normalized features describing general qualities of a borrower's residence that would apply to any building type also had a normal appearance without much positive or negative skewness. Such features include \colorbox{backcolor}{\textcolor{black}{\texttt{YEARS_BUILD_AVG}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{FLOORSMIN_MODE}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{FLOORSMAX_AVG}}}, which indicate the year the residence was built and measures of number of floors, respectively.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{distribsELEVATORSMEDICOMMONAREAMEDINONLIVINGAPARTMENTSMED}
+\centering
+\caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{ELEVATORS_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{NONLIVINGAPARTMENTS_MEDI}}}}
+\end{figure}
+
+On the other hand, the remaining normalized features, such as \colorbox{backcolor}{\textcolor{black}{\texttt{ELEVATORS_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{NONLIVINGAPARTMENTS_MEDI}}}, describe more niche characteristics of a residence building that may not apply to many borrowers in the training set. For example, individuals who live in a house wouldn't be expected to have any elevators, a public common area, or non-living apartments in their residence. Even though these features have been normalized, they tend to be noticeably positively skewed.
+
+\subsubsection{Distributions of Main Data Table Numerical Features Identified as Non-Normalized}
+I also plotted histograms of 21 numerical features that were not identified by Home Credit as being normalized, in order to observe their skewness and discover which ones would be candidates for log-normalization. All 21 plots can be viewed in Appendix \ref{nonnormalfeaturedistibs}. All of these 21 features will need to be scaled to a range of [0.0,1.0]. All but three features are good candidates for log-normalization -- especially features having most values concentrated near zero and a smattering of large-valued outliers. Log-normalization may prevent the wide gulfs between these features' very large and small values from hindering a learning algorithm's performance.
+
+Interestingly, the features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_BIRTH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_ID_PUBLISH}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}} already have non-skewed, normal shaped distributions. It will not be necessary for them to be log-normalized.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{distribsDAYSBIRTHDAYSIDPUBLISHHOURAPPRPROCESSSTART}
+\centering
+\caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_BIRTH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_ID_PUBLISH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}}}
+\end{figure}
+
+Finally, the two features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} contain an alarmingly large amount of high-valued outliers that will need to be addressed. I explore each of these features in depth below.
+
+\subsubsection{Deeper Dive into the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} Feature}
+I observed that the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} feature (the number of days before submitting their loan application that the applicant began their job) has more than 55,000 entries that contain impossibly large, positive entries similar to the value of 365,243 days (just over 1,000 years) that I had observed previously. The lone saving grace is that at least \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} has no `NaN' entries.
+
+\begin{figure}[ht]
+\includegraphics[width=0.7\textwidth]{distribDAYSEMPLOYED}
+\centering
+\caption{Distribution of Feature \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}}
+\end{figure}
+
+\pagebreak
+
+I ranked each value of \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} in descending order of frequency and confirmed that all these outlier entries had the same value of 365,243.
+
+\begin{lstlisting}
+ VALUE | COUNT
+---------------
+365243 |  55374
+0      |      2
+-1     |      1
+-2     |      2
+-3     |      3
+-4     |      4
+      ...
+-17583 |      1
+-17912 |      1
+\end{lstlisting}
+
+Based on the definition of \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}, valid values should be in the range ($\infty$,0]. Instead, exactly 55,374 entries, or nearly one-sixth of the entire training dataset, have entries of 365243. Were this to be interpreted literally, it would be an indication that one-sixth of the dataset got a job just over 1,000 years after submitting their loan applications to Home Credit.
+
+This meaning is obviously absurd and there has to be another reason that so many borrowers had a value of 365243 for this feature. Since there were no instances of borrowers having different non-zero positive values, my best guess is that 365243 was not meant to indicate a numerical value. I believe that this value was entered into Home Credit's computer system when an applicant did not have a job when they submitted their loan application to Home Credit. Since any negative integer or 0 would be a valid entry under this feature, and perhaps due to the data entry system's inability to accept any datatype besides an integer, or perhaps due the system's inability to accept an empty (null) input in the feature's entry field, I hypothesize that the original data enterers at Home Credit simply entered the largest positive integer that the system would accept in order to indicate that the applicant didn't currently have a job.
+
+Intuitively, I can see that all things being equal, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} may well be a good predictor of target values. After all, if someone doesn't have a job or only just recently got a job, it stands to reason that there is a greater chance they won't have enough money to make loan payments on time. Unfortunately, I am not confident that the feature, as currently structured, will be able to adequately convey this information to a learning algorithm.
+
+I therefore propose two separate but complementary strategies to work around \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}'s shortcomings:
+
+\begin{enumerate}
+ \item Create a new categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. All individuals who have a value of 365243 for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} will be assigned a value of 0 for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. All individuals who have a value of 0 or less for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} will be assigned a value of 1 for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}.
+ \item Replace all the entries in \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} containing the value 365243 with `NaN'. If I were to do this, the feature's new distribution appears to be more normal and may be more promising for use with a learning algorithm.
+\end{enumerate}
+
+\begin{figure}[ht]
+\includegraphics[width=0.7\textwidth]{distribDAYSEMPLOYEDMODIFIED}
+\centering
+\caption{Distribution of Feature \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} with the Anomalous 55,374 ``365243" Entries Removed}
+\end{figure}
+
+\subsubsection{Deeper Dive into the \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} Feature}
+There appear to be just under 4,000 borrowers who have a value for \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} that's between 60.0 and 70.0. This is far too many people than would be expected based on this feature's distribution.
+
+\begin{figure}[ht]
+\includegraphics[width=0.7\textwidth]{distribOWNCARAGE}
+\centering
+\caption{Distribution of Feature \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}}}
+\end{figure}
+
+Specifically, there are 3,334 borrowers that have a car that's 64 or 65 years old.
+
+\begin{lstlisting}
+VALUE  |  COUNT
+----------------
+91.0   |      2
+69.0   |      1
+65.0   |    891
+64.0   |   2443
+63.0   |      2
+57.0   |      1
+56.0   |      1
+      ...
+2.0    |   5852
+1.0    |   5280
+0.0    |   2134
+\end{lstlisting}
+
+I can only conclude that this is evidence of some sort of anomaly -- I can think of no alternative logical explanation that could explain this spike. The only kinds of cars that are still functional after 60+ years are collectible classic cars, and folks who apply for loans from Home Credit come from a far less well-off demographic than that which is typically associated with classic car collecting.
+
+Thankfully, I can see right away that the distribution of \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} is less problematic than was the case for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}. There is at least a smooth decrease in the frequency of users having older cars right up to the point where the anomalous spike occurs.
+
+The distribution's pattern indicates that I should expect only one or two borrowers to have cars that are 64 or 65 years old, and yet I can't formulate a compelling justification for removing the outlier entries from the \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} feature. Should all 3,334 of the datapoints in question be removed? Should all but a handful of them be removed? Indeed, doing this would keep the distribution smooth, but how would I choose which lucky few datapoints are kept in order to ensure the distribution is smooth over car ages of 64.0 and 65.0?
+
+The good news is that I probably won't have to worry about this. Since 3,334 borrowers is only just over 3\% of the \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} feature's 104,582 valid non-`NaN' entries, log-normalizing this feature should be enough to counteract any negative effects that the anomalous spike may have on a learning algorithm.
+
 \subsection{Algorithms and Techniques}
+
+
 \subsection{Benchmark}
 Since Kaggle ranks submissions to this competition by the area under the ROC curve between their predicted proabilities of delinquency and the actual observed targets (whether or not the borrower did make at least one late payment), an ideal benchmark would be the area under ROC curve of the prediction model employed by Home Credit's data scientists prior to this competition's debut on Kaggle.
 
-However, since Home Credit possibly considers the specifics of this model and its ROC curve area to be proprietary information, it is understandable that this score has not been disclosed. As a next best alternative, I will use as a benchmark the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score. The reader may refer to the file \colorbox{backcolor}{\textcolor{red}{\texttt{home-credit-default-risk-publicleaderboard(6-02-2018).csv}}}, located inside this project's Github repository\cite{githubprojectrepo}, to verify my calculation of this benchmark.
+However, since Home Credit possibly considers the specifics of this model and its ROC curve area to be proprietary information, it is understandable that this score has not been disclosed. As a next best alternative, I will use as a benchmark the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score. The reader may refer to the file \colorbox{backcolor}{\textcolor{black}{\texttt{home-credit-default-risk-publicleaderboard(6-02-2018).csv}}}, located inside this project's Github repository\cite{githubprojectrepo}, to verify my calculation of this benchmark.
 
 \section{Methodology}
 \subsection{Data Preprocessing}
@@ -191,7 +414,7 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
   \item \textbf{NAME_EDUCATION_TYPE}: Level of highest education the client achieved
   \item \textbf{NAME_FAMILY_STATUS}: Family status of the client
   \item \textbf{NAME_HOUSING_TYPE}: What is the housing situation of the client (renting, living with parents, ...)
-  \item \textbf{REGION_POPULATION_RELATIVE}: Normalized population of region where client lives (higher number means the client lives in more populated region) -- normalized
+  \item \textbf{REGION_POPULATION_RELATIVE}: Normalized population of region where client lives (higher number means the client lives in more populated region) -- normalized (although distribution is normal with minimal skewness, values are in approximate range [0.00,0.07] -- this is the only normalized feature in the main data table not distributed over the range [0,1])
   \item \textbf{DAYS_BIRTH}: Client's age in days at the time of application -- time only relative to the application
   \item \textbf{DAYS_EMPLOYED}: How many days before the application the person started current employment -- time only relative to the application
   \item \textbf{DAYS_REGISTRATION}: How many days before the application did client change his registration -- time only relative to the application
@@ -216,56 +439,56 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
   \item \textbf{REG_CITY_NOT_WORK_CITY}: Flag if client's permanent address does not match work address (1=different, 0=same, at city level)
   \item \textbf{LIVE_CITY_NOT_WORK_CITY}: Flag if client's contact address does not match work address (1=different, 0=same, at city level)
   \item \textbf{ORGANIZATION_TYPE}: Type of organization where client works
-  \item \textbf{EXT_SOURCE_1}: Normalized score from external data source -- normalized
-  \item \textbf{EXT_SOURCE_2}: Normalized score from external data source -- normalized
-  \item \textbf{EXT_SOURCE_3}: Normalized score from external data source -- normalized
-  \item \textbf{APARTMENTS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{BASEMENTAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{YEARS_BEGINEXPLUATATION_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{YEARS_BUILD_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{COMMONAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{ELEVATORS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{ENTRANCES_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FLOORSMAX_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FLOORSMIN_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LANDAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LIVINGAPARTMENTS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LIVINGAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{NONLIVINGAPARTMENTS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{NONLIVINGAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{APARTMENTS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{BASEMENTAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{YEARS_BEGINEXPLUATATION_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{YEARS_BUILD_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{COMMONAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{ELEVATORS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{ENTRANCES_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FLOORSMAX_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FLOORSMIN_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LANDAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LIVINGAPARTMENTS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LIVINGAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{NONLIVINGAPARTMENTS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{NONLIVINGAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{APARTMENTS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{BASEMENTAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{YEARS_BEGINEXPLUATATION_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{YEARS_BUILD_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{COMMONAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{ELEVATORS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{ENTRANCES_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FLOORSMAX_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FLOORSMIN_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LANDAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LIVINGAPARTMENTS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{LIVINGAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{NONLIVINGAPARTMENTS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{NONLIVINGAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{FONDKAPREMONT_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{HOUSETYPE_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{TOTALAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{WALLSMATERIAL_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
-  \item \textbf{EMERGENCYSTATE_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized
+  \item \textbf{EXT_SOURCE_1}: Normalized score from external data source -- normalized, scaled to range [0,1]
+  \item \textbf{EXT_SOURCE_2}: Normalized score from external data source -- normalized, scaled to range [0,1]
+  \item \textbf{EXT_SOURCE_3}: Normalized score from external data source -- normalized, scaled to range [0,1]
+  \item \textbf{APARTMENTS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{BASEMENTAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{YEARS_BEGINEXPLUATATION_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{YEARS_BUILD_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{COMMONAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{ELEVATORS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{ENTRANCES_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FLOORSMAX_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FLOORSMIN_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LANDAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LIVINGAPARTMENTS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LIVINGAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{NONLIVINGAPARTMENTS_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{NONLIVINGAREA_AVG}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{APARTMENTS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{BASEMENTAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{YEARS_BEGINEXPLUATATION_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{YEARS_BUILD_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{COMMONAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{ELEVATORS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{ENTRANCES_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FLOORSMAX_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FLOORSMIN_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LANDAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LIVINGAPARTMENTS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LIVINGAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{NONLIVINGAPARTMENTS_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{NONLIVINGAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{APARTMENTS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{BASEMENTAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{YEARS_BEGINEXPLUATATION_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{YEARS_BUILD_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{COMMONAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{ELEVATORS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{ENTRANCES_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FLOORSMAX_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FLOORSMIN_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LANDAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LIVINGAPARTMENTS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{LIVINGAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{NONLIVINGAPARTMENTS_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{NONLIVINGAREA_MEDI}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{FONDKAPREMONT_MODE}: Categorical -- unclear exactly what this feature indicates. Examples of entries include ``reg oper account," ``reg oper spec account," ``org spec account." (Originally mislabeled by Home Credit as ``Normalized information about building where the client lives.")
+  \item \textbf{HOUSETYPE_MODE}: Categorical -- type of residence applicant lives in. (Originally mislabeled by Home Credit as ``Normalized information about building where the client lives.")
+  \item \textbf{TOTALAREA_MODE}: Normalized information about building where the client lives, What is average (_AVG suffix), modus (_MODE suffix), median (_MEDI suffix) apartment size, common area, living area, age of building, number of elevators, number of entrances, state of the building, number of floor -- normalized, scaled to range [0,1]
+  \item \textbf{WALLSMATERIAL_MODE}: Categorical -- type of material that the walls in applicant's residence are made of. (Originally mislabeled by Home Credit as ``Normalized information about building where the client lives.")
+  \item \textbf{EMERGENCYSTATE_MODE}: Categorical -- unclear exactly what this feature indicates. Examples of entries include ``Yes" and ``No." (Originally mislabeled by Home Credit as ``Normalized information about building where the client lives.")
   \item \textbf{OBS_30_CNT_SOCIAL_CIRCLE}: How many observation of client's social surroundings with observable 30 DPD (days past due) default
   \item \textbf{DEF_30_CNT_SOCIAL_CIRCLE}: How many observation of client's social surroundings defaulted on 30 DPD (days past due)
   \item \textbf{OBS_60_CNT_SOCIAL_CIRCLE}: How many observation of client's social surroundings with observable 60 DPD (days past due) default
@@ -300,9 +523,10 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
 \end{enumerate}
 
 \subsection{Bureau Data Table Features (bureau.csv)}
+\label{bureaudatatablefeatures}
 \begin{enumerate}
   \item \textbf{SK_ID_CURR}: ID of loan in our sample - one loan in our sample can have 0,1,2 or more related previous credits in credit bureau -- hashed
-  \item \textbf{SK_BUREAU_ID}: Recoded ID of previous Credit Bureau credit related to our loan (unique coding for each loan application) -- hashed
+  \item \textbf{SK_ID_BUREAU}: Recoded ID of previous Credit Bureau credit related to our loan (unique coding for each loan application) -- hashed
   \item \textbf{CREDIT_ACTIVE}: Status of the Credit Bureau (CB) reported credits
   \item \textbf{CREDIT_CURRENCY}: Recoded currency of the Credit Bureau credit -- recoded
   \item \textbf{DAYS_CREDIT}: How many days before current application did client apply for Credit Bureau credit -- time only relative to the application
@@ -321,8 +545,9 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
 \end{enumerate}
 
 \subsection{Bureau Balance Data Table Features (bureau_balance.csv)}
+\label{bureaubalancedatatablefeatures}
 \begin{enumerate}
-  \item \textbf{SK_BUREAU_ID}: Recoded ID of Credit Bureau credit (unique coding for each application) - use this to join to CREDIT_BUREAU table -- hashed
+  \item \textbf{SK_ID_BUREAU}: Recoded ID of Credit Bureau credit (unique coding for each application) - use this to join to CREDIT_BUREAU table -- hashed
   \item \textbf{MONTHS_BALANCE}: Month of balance relative to application date (-1 means the freshest balance date) -- time only relative to the application
   \item \textbf{STATUS}: Status of Credit Bureau loan during the month (active, closed, DPD0-30,Ö [C means closed, X means status unknown, 0 means no DPD, 1 means maximal did during month between 1-30, 2 means DPD 31-60,Ö 5 means DPD 120+ or sold or written off ])
 \end{enumerate}
@@ -368,7 +593,7 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
   \item \textbf{NFLAG_INSURED_ON_APPROVAL}: Did the client requested insurance during the previous application
 \end{enumerate}
 
-\subsection{POS CASH Balance Data Table Feature (POS_CASH_balance.csv)}
+\subsection{POS CASH Balance Data Table Features (POS_CASH_balance.csv)}
 \begin{enumerate}
   \item \textbf{SK_ID_PREV}: ID of previous credit in Home Credit related to loan in our sample. (One loan in our sample can have 0,1,2 or more previous loans in Home Credit)
   \item \textbf{SK_ID_CURR}: ID of loan in our sample
@@ -418,6 +643,736 @@ From the HomeCredit_columns_description.csv file on the \href{https://www.kaggle
   \item \textbf{SK_DPD}: DPD (Days past due) during the month on the previous credit
   \item \textbf{SK_DPD_DEF}: DPD (Days past due) during the month with tolerance (debts with low loan amounts are ignored) of the previous credit
 \end{enumerate}
+
+\section{Data Table Statistical Summaries}
+\label{appendix:datatablestatsummaries}
+\subsection{Main Data Table Statistical Summary (application_train.csv)}
+\label{appendix:maindatatablestatsummary}
+
+\tiny
+\definecolor{lightgray}{gray}{0.92}
+{\rowcolors{2}{white}{lightgray}
+\begin{longtable}[c]{| l || r | r | r | r | r | r | r | r |}
+
+ \caption{Main Data Table Statistical Summary\label{maindatatablestatsummary}}\\
+
+ \hline
+ \rowcolor{white} \multicolumn{9}{| c |}{\textbf{application_train.csv Feature Statistics}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Count} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{Max}\\
+ \hline
+ \endfirsthead
+
+ \rowcolor{white} \caption[]{Main Data Table Statistical Summary (continued)}\\
+ \rowcolor{white} \hline
+ \rowcolor{white} \multicolumn{9}{|c|}{\textbf{application_train.csv Feature Statistics}\ref{maindatatablestatsummary}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Count} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{Max}\\
+ \hline
+ \endhead
+
+ \hline
+ \endfoot
+
+ \hline
+ \endlastfoot
+
+ SK_ID_CURR	&	307511	&	278180.5186	&	102790.1753	&	1.00E+05	&	189145.5	&	278202	&	367142.5	&	4.56E+05	\\
+ TARGET	&	307511	&	0.080729	&	0.272419	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ CNT_CHILDREN	&	307511	&	0.417052	&	0.722121	&	0.00E+00	&	0	&	0	&	1	&	1.90E+01	\\
+ AMT_INCOME_TOTAL	&	307511	&	168797.9193	&	237123.1463	&	2.57E+04	&	112500	&	147150	&	202500	&	1.17E+08	\\
+ AMT_CREDIT	&	307511	&	599025.9997	&	402490.777	&	4.50E+04	&	270000	&	513531	&	808650	&	4.05E+06	\\
+ AMT_ANNUITY	&	307499	&	27108.57391	&	14493.73732	&	1.62E+03	&	16524	&	24903	&	34596	&	2.58E+05	\\
+ AMT_GOODS_PRICE	&	307233	&	538396.2074	&	369446.4605	&	4.05E+04	&	238500	&	450000	&	679500	&	4.05E+06	\\
+ REGION_POPULATION_RELATIVE	&	307511	&	0.020868	&	0.013831	&	2.90E-04	&	0.010006	&	0.01885	&	0.028663	&	7.25E-02	\\
+ DAYS_BIRTH	&	307511	&	-16036.99507	&	4363.988632	&	-2.52E+04	&	-19682	&	-15750	&	-12413	&	-7.49E+03	\\
+ DAYS_EMPLOYED	&	307511	&	63815.0459	&	141275.7665	&	-1.79E+04	&	-2760	&	-1213	&	-289	&	3.65E+05	\\
+ DAYS_REGISTRATION	&	307511	&	-4986.120328	&	3522.886321	&	-2.47E+04	&	-7479.5	&	-4504	&	-2010	&	0.00E+00	\\
+ DAYS_ID_PUBLISH	&	307511	&	-2994.202373	&	1509.450419	&	-7.20E+03	&	-4299	&	-3254	&	-1720	&	0.00E+00	\\
+ OWN_CAR_AGE	&	104582	&	12.061091	&	11.944812	&	0.00E+00	&	5	&	9	&	15	&	9.10E+01	\\
+ FLAG_MOBIL	&	307511	&	0.999997	&	0.001803	&	0.00E+00	&	1	&	1	&	1	&	1.00E+00	\\
+ FLAG_EMP_PHONE	&	307511	&	0.819889	&	0.38428	&	0.00E+00	&	1	&	1	&	1	&	1.00E+00	\\
+ FLAG_WORK_PHONE	&	307511	&	0.199368	&	0.399526	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_CONT_MOBILE	&	307511	&	0.998133	&	0.043164	&	0.00E+00	&	1	&	1	&	1	&	1.00E+00	\\
+ FLAG_PHONE	&	307511	&	0.281066	&	0.449521	&	0.00E+00	&	0	&	0	&	1	&	1.00E+00	\\
+ FLAG_EMAIL	&	307511	&	0.05672	&	0.231307	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ CNT_FAM_MEMBERS	&	307509	&	2.152665	&	0.910682	&	1.00E+00	&	2	&	2	&	3	&	2.00E+01	\\
+ REGION_RATING_CLIENT	&	307511	&	2.052463	&	0.509034	&	1.00E+00	&	2	&	2	&	2	&	3.00E+00	\\
+ REGION_RATING_CLIENT_W_CITY	&	307511	&	2.031521	&	0.502737	&	1.00E+00	&	2	&	2	&	2	&	3.00E+00	\\
+ HOUR_APPR_PROCESS_START	&	307511	&	12.063419	&	3.265832	&	0.00E+00	&	10	&	12	&	14	&	2.30E+01	\\
+ REG_REGION_NOT_LIVE_REGION	&	307511	&	0.015144	&	0.122126	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ REG_REGION_NOT_WORK_REGION	&	307511	&	0.050769	&	0.219526	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ LIVE_REGION_NOT_WORK_REGION	&	307511	&	0.040659	&	0.197499	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ REG_CITY_NOT_LIVE_CITY	&	307511	&	0.078173	&	0.268444	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ REG_CITY_NOT_WORK_CITY	&	307511	&	0.230454	&	0.421124	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ LIVE_CITY_NOT_WORK_CITY	&	307511	&	0.179555	&	0.383817	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ EXT_SOURCE_1	&	134133	&	0.50213	&	0.211062	&	1.46E-02	&	0.334007	&	0.505998	&	0.675053	&	9.63E-01	\\
+ EXT_SOURCE_2	&	306851	&	0.514393	&	0.19106	&	8.17E-08	&	0.392457	&	0.565961	&	0.663617	&	8.55E-01	\\
+ EXT_SOURCE_3	&	246546	&	0.510853	&	0.194844	&	5.27E-04	&	0.37065	&	0.535276	&	0.669057	&	8.96E-01	\\
+ APARTMENTS_AVG	&	151450	&	0.11744	&	0.10824	&	0.00E+00	&	0.0577	&	0.0876	&	0.1485	&	1.00E+00	\\
+ BASEMENTAREA_AVG	&	127568	&	0.088442	&	0.082438	&	0.00E+00	&	0.0442	&	0.0763	&	0.1122	&	1.00E+00	\\
+ YEARS_BEGINEXPLUATATION_AVG	&	157504	&	0.977735	&	0.059223	&	0.00E+00	&	0.9767	&	0.9816	&	0.9866	&	1.00E+00	\\
+ YEARS_BUILD_AVG	&	103023	&	0.752471	&	0.11328	&	0.00E+00	&	0.6872	&	0.7552	&	0.8232	&	1.00E+00	\\
+ COMMONAREA_AVG	&	92646	&	0.044621	&	0.076036	&	0.00E+00	&	0.0078	&	0.0211	&	0.0515	&	1.00E+00	\\
+ ELEVATORS_AVG	&	143620	&	0.078942	&	0.134576	&	0.00E+00	&	0	&	0	&	0.12	&	1.00E+00	\\
+ ENTRANCES_AVG	&	152683	&	0.149725	&	0.100049	&	0.00E+00	&	0.069	&	0.1379	&	0.2069	&	1.00E+00	\\
+ FLOORSMAX_AVG	&	154491	&	0.226282	&	0.144641	&	0.00E+00	&	0.1667	&	0.1667	&	0.3333	&	1.00E+00	\\
+ FLOORSMIN_AVG	&	98869	&	0.231894	&	0.16138	&	0.00E+00	&	0.0833	&	0.2083	&	0.375	&	1.00E+00	\\
+ LANDAREA_AVG	&	124921	&	0.066333	&	0.081184	&	0.00E+00	&	0.0187	&	0.0481	&	0.0856	&	1.00E+00	\\
+ LIVINGAPARTMENTS_AVG	&	97312	&	0.100775	&	0.092576	&	0.00E+00	&	0.0504	&	0.0756	&	0.121	&	1.00E+00	\\
+ LIVINGAREA_AVG	&	153161	&	0.107399	&	0.110565	&	0.00E+00	&	0.0453	&	0.0745	&	0.1299	&	1.00E+00	\\
+ NONLIVINGAPARTMENTS_AVG	&	93997	&	0.008809	&	0.047732	&	0.00E+00	&	0	&	0	&	0.0039	&	1.00E+00	\\
+ NONLIVINGAREA_AVG	&	137829	&	0.028358	&	0.069523	&	0.00E+00	&	0	&	0.0036	&	0.0277	&	1.00E+00	\\
+ APARTMENTS_MODE	&	151450	&	0.114231	&	0.107936	&	0.00E+00	&	0.0525	&	0.084	&	0.1439	&	1.00E+00	\\
+ BASEMENTAREA_MODE	&	127568	&	0.087543	&	0.084307	&	0.00E+00	&	0.0407	&	0.0746	&	0.1124	&	1.00E+00	\\
+ YEARS_BEGINEXPLUATATION_MODE	&	157504	&	0.977065	&	0.064575	&	0.00E+00	&	0.9767	&	0.9816	&	0.9866	&	1.00E+00	\\
+ YEARS_BUILD_MODE	&	103023	&	0.759637	&	0.110111	&	0.00E+00	&	0.6994	&	0.7648	&	0.8236	&	1.00E+00	\\
+ COMMONAREA_MODE	&	92646	&	0.042553	&	0.074445	&	0.00E+00	&	0.0072	&	0.019	&	0.049	&	1.00E+00	\\
+ ELEVATORS_MODE	&	143620	&	0.07449	&	0.132256	&	0.00E+00	&	0	&	0	&	0.1208	&	1.00E+00	\\
+ ENTRANCES_MODE	&	152683	&	0.145193	&	0.100977	&	0.00E+00	&	0.069	&	0.1379	&	0.2069	&	1.00E+00	\\
+ FLOORSMAX_MODE	&	154491	&	0.222315	&	0.143709	&	0.00E+00	&	0.1667	&	0.1667	&	0.3333	&	1.00E+00	\\
+ FLOORSMIN_MODE	&	98869	&	0.228058	&	0.16116	&	0.00E+00	&	0.0833	&	0.2083	&	0.375	&	1.00E+00	\\
+ LANDAREA_MODE	&	124921	&	0.064958	&	0.08175	&	0.00E+00	&	0.0166	&	0.0458	&	0.0841	&	1.00E+00	\\
+ LIVINGAPARTMENTS_MODE	&	97312	&	0.105645	&	0.09788	&	0.00E+00	&	0.0542	&	0.0771	&	0.1313	&	1.00E+00	\\
+ LIVINGAREA_MODE	&	153161	&	0.105975	&	0.111845	&	0.00E+00	&	0.0427	&	0.0731	&	0.1252	&	1.00E+00	\\
+ NONLIVINGAPARTMENTS_MODE	&	93997	&	0.008076	&	0.046276	&	0.00E+00	&	0	&	0	&	0.0039	&	1.00E+00	\\
+ NONLIVINGAREA_MODE	&	137829	&	0.027022	&	0.070254	&	0.00E+00	&	0	&	0.0011	&	0.0231	&	1.00E+00	\\
+ APARTMENTS_MEDI	&	151450	&	0.11785	&	0.109076	&	0.00E+00	&	0.0583	&	0.0864	&	0.1489	&	1.00E+00	\\
+ BASEMENTAREA_MEDI	&	127568	&	0.087955	&	0.082179	&	0.00E+00	&	0.0437	&	0.0758	&	0.1116	&	1.00E+00	\\
+ YEARS_BEGINEXPLUATATION_MEDI	&	157504	&	0.977752	&	0.059897	&	0.00E+00	&	0.9767	&	0.9816	&	0.9866	&	1.00E+00	\\
+ YEARS_BUILD_MEDI	&	103023	&	0.755746	&	0.112066	&	0.00E+00	&	0.6914	&	0.7585	&	0.8256	&	1.00E+00	\\
+ COMMONAREA_MEDI	&	92646	&	0.044595	&	0.076144	&	0.00E+00	&	0.0079	&	0.0208	&	0.0513	&	1.00E+00	\\
+ ELEVATORS_MEDI	&	143620	&	0.078078	&	0.134467	&	0.00E+00	&	0	&	0	&	0.12	&	1.00E+00	\\
+ ENTRANCES_MEDI	&	152683	&	0.149213	&	0.100368	&	0.00E+00	&	0.069	&	0.1379	&	0.2069	&	1.00E+00	\\
+ FLOORSMAX_MEDI	&	154491	&	0.225897	&	0.145067	&	0.00E+00	&	0.1667	&	0.1667	&	0.3333	&	1.00E+00	\\
+ FLOORSMIN_MEDI	&	98869	&	0.231625	&	0.161934	&	0.00E+00	&	0.0833	&	0.2083	&	0.375	&	1.00E+00	\\
+ LANDAREA_MEDI	&	124921	&	0.067169	&	0.082167	&	0.00E+00	&	0.0187	&	0.0487	&	0.0868	&	1.00E+00	\\
+ LIVINGAPARTMENTS_MEDI	&	97312	&	0.101954	&	0.093642	&	0.00E+00	&	0.0513	&	0.0761	&	0.1231	&	1.00E+00	\\
+ LIVINGAREA_MEDI	&	153161	&	0.108607	&	0.11226	&	0.00E+00	&	0.0457	&	0.0749	&	0.1303	&	1.00E+00	\\
+ NONLIVINGAPARTMENTS_MEDI	&	93997	&	0.008651	&	0.047415	&	0.00E+00	&	0	&	0	&	0.0039	&	1.00E+00	\\
+ NONLIVINGAREA_MEDI	&	137829	&	0.028236	&	0.070166	&	0.00E+00	&	0	&	0.0031	&	0.0266	&	1.00E+00	\\
+ TOTALAREA_MODE	&	159080	&	0.102547	&	0.107462	&	0.00E+00	&	0.0412	&	0.0688	&	0.1276	&	1.00E+00	\\
+ OBS_30_CNT_SOCIAL_CIRCLE	&	306490	&	1.422245	&	2.400989	&	0.00E+00	&	0	&	0	&	2	&	3.48E+02	\\
+ DEF_30_CNT_SOCIAL_CIRCLE	&	306490	&	0.143421	&	0.446698	&	0.00E+00	&	0	&	0	&	0	&	3.40E+01	\\
+ OBS_60_CNT_SOCIAL_CIRCLE	&	306490	&	1.405292	&	2.379803	&	0.00E+00	&	0	&	0	&	2	&	3.44E+02	\\
+ DEF_60_CNT_SOCIAL_CIRCLE	&	306490	&	0.100049	&	0.362291	&	0.00E+00	&	0	&	0	&	0	&	2.40E+01	\\
+ DAYS_LAST_PHONE_CHANGE	&	307510	&	-962.858788	&	826.808487	&	-4.29E+03	&	-1570	&	-757	&	-274	&	0.00E+00	\\
+ FLAG_DOCUMENT_2	&	307511	&	0.000042	&	0.006502	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_3	&	307511	&	0.710023	&	0.453752	&	0.00E+00	&	0	&	1	&	1	&	1.00E+00	\\
+ FLAG_DOCUMENT_4	&	307511	&	0.000081	&	0.009016	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_5	&	307511	&	0.015115	&	0.12201	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_6	&	307511	&	0.088055	&	0.283376	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_7	&	307511	&	0.000192	&	0.01385	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_8	&	307511	&	0.081376	&	0.273412	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_9	&	307511	&	0.003896	&	0.062295	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_10	&	307511	&	0.000023	&	0.004771	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_11	&	307511	&	0.003912	&	0.062424	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_12	&	307511	&	0.000007	&	0.00255	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_13	&	307511	&	0.003525	&	0.059268	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_14	&	307511	&	0.002936	&	0.05411	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_15	&	307511	&	0.00121	&	0.03476	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_16	&	307511	&	0.009928	&	0.099144	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_17	&	307511	&	0.000267	&	0.016327	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_18	&	307511	&	0.00813	&	0.089798	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_19	&	307511	&	0.000595	&	0.024387	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_20	&	307511	&	0.000507	&	0.022518	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ FLAG_DOCUMENT_21	&	307511	&	0.000335	&	0.018299	&	0.00E+00	&	0	&	0	&	0	&	1.00E+00	\\
+ AMT_REQ_CREDIT_BUREAU_HOUR	&	265992	&	0.006402	&	0.083849	&	0.00E+00	&	0	&	0	&	0	&	4.00E+00	\\
+ AMT_REQ_CREDIT_BUREAU_DAY	&	265992	&	0.007	&	0.110757	&	0.00E+00	&	0	&	0	&	0	&	9.00E+00	\\
+ AMT_REQ_CREDIT_BUREAU_WEEK	&	265992	&	0.034362	&	0.204685	&	0.00E+00	&	0	&	0	&	0	&	8.00E+00	\\
+ AMT_REQ_CREDIT_BUREAU_MON	&	265992	&	0.267395	&	0.916002	&	0.00E+00	&	0	&	0	&	0	&	2.70E+01	\\
+ AMT_REQ_CREDIT_BUREAU_QRT	&	265992	&	0.265474	&	0.794056	&	0.00E+00	&	0	&	0	&	0	&	2.61E+02	\\
+ AMT_REQ_CREDIT_BUREAU_YEAR	&	265992	&	1.899974	&	1.869295	&	0.00E+00	&	0	&	1	&	3	&	2.50E+01	\\
+\end{longtable}
+}
+\normalsize
+
+\subsection{Bureau Data Table Statistical Summary (bureau.csv)}
+\label{appendix:bureaudatatablestatsummary}
+
+\tiny
+\definecolor{lightgray}{gray}{0.92}
+{\rowcolors{2}{white}{lightgray}
+\begin{longtable}[c]{| l || r | r | r | r | r | r | r | r |}
+
+ \caption{Bureau Data Table Statistical Summary\label{bureaudatatablestatsummary}}\\
+
+ \hline
+ \rowcolor{white} \multicolumn{9}{| c |}{\textbf{bureau.csv Feature Statistics}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Count} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{Max}\\
+ \hline
+ \endfirsthead
+
+ \rowcolor{white} \caption[]{Bureau Data Table Statistical Summary (continued)}\\
+ \rowcolor{white} \hline
+ \rowcolor{white} \multicolumn{9}{|c|}{\textbf{bureau.csv Feature Statistics}\ref{bureaudatatablestatsummary}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Count} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{Max}\\
+ \hline
+ \endhead
+
+ \hline
+ \endfoot
+
+ \hline
+ \endlastfoot
+
+ SK_ID_CURR	&	1716428	&	2.78E+05	&	1.03E+05	&	100001	&	188866.75	&	278055	&	367426	&	4.56E+05	\\
+SK_ID_BUREAU	&	1716428	&	5.92E+06	&	5.32E+05	&	5000000	&	5463953.75	&	5926303.5	&	6385681.25	&	6.84E+06	\\
+DAYS_CREDIT	&	1716428	&	-1.14E+03	&	7.95E+02	&	-2922	&	-1666	&	-987	&	-474	&	0.00E+00	\\
+CREDIT_DAY_OVERDUE	&	1716428	&	8.18E-01	&	3.65E+01	&	0	&	0	&	0	&	0	&	2.79E+03	\\
+DAYS_CREDIT_ENDDATE	&	1610875	&	5.11E+02	&	4.99E+03	&	-42060	&	-1138	&	-330	&	474	&	3.12E+04	\\
+DAYS_ENDDATE_FACT	&	1082775	&	-1.02E+03	&	7.14E+02	&	-42023	&	-1489	&	-897	&	-425	&	0.00E+00	\\
+AMT_CREDIT_MAX_OVERDUE	&	591940	&	3.83E+03	&	2.06E+05	&	0	&	0	&	0	&	0	&	1.16E+08	\\
+CNT_CREDIT_PROLONG	&	1716428	&	6.41E-03	&	9.62E-02	&	0	&	0	&	0	&	0	&	9.00E+00	\\
+AMT_CREDIT_SUM	&	1716415	&	3.55E+05	&	1.15E+06	&	0	&	51300	&	125518.5	&	315000	&	5.85E+08	\\
+AMT_CREDIT_SUM_DEBT	&	1458759	&	1.37E+05	&	6.77E+05	&	-4705600.32	&	0	&	0	&	40153.5	&	1.70E+08	\\
+AMT_CREDIT_SUM_LIMIT	&	1124648	&	6.23E+03	&	4.50E+04	&	-586406.115	&	0	&	0	&	0	&	4.71E+06	\\
+AMT_CREDIT_SUM_OVERDUE	&	1716428	&	3.79E+01	&	5.94E+03	&	0	&	0	&	0	&	0	&	3.76E+06	\\
+DAYS_CREDIT_UPDATE	&	1716428	&	-5.94E+02	&	7.21E+02	&	-41947	&	-908	&	-395	&	-33	&	3.72E+02	\\
+AMT_ANNUITY	&	489637	&	1.57E+04	&	3.26E+05	&	0	&	0	&	0	&	13500	&	1.18E+08	\\
+\end{longtable}
+}
+\normalsize
+
+\section{Data Table Samples}
+\label{appendix:datatablesamples}
+\subsection{Main Data Table Samples (application_\{train \textbar~test\}.csv)}
+\label{appendix:maindatatablesamples}
+
+\tiny
+\definecolor{lightgray}{gray}{0.92}
+{\rowcolors{2}{white}{lightgray}
+\begin{longtable}[c]{| l || p{2cm} | p{2cm} | p{2cm} | p{2cm} | p{2cm} |}
+
+ \caption{Main Data Table Samples\label{maindatatablesamples}}\\
+
+ \hline
+ \rowcolor{white} \multicolumn{6}{| c |}{\textbf{application_train.csv Samples}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Index 0} & \textbf{Index 1} & \textbf{Index 2} & \textbf{Index 3} & \textbf{Index 4}\\
+ \hline
+ \endfirsthead
+
+ \rowcolor{white} \caption[]{Main Data Table Samples (continued)}\\
+ \rowcolor{white} \hline
+ \rowcolor{white} \multicolumn{6}{|c|}{\textbf{application_train.csv Samples}\ref{maindatatablesamples}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Index 0} & \textbf{Index 1} & \textbf{Index 2} & \textbf{Index 3} & \textbf{Index 4}\\
+ \hline
+ \endhead
+
+ \hline
+ \endfoot
+
+ \hline
+ \endlastfoot
+
+ SK_ID_CURR	&	100002	&	100003	&	100004	&	100006	&	100007	\\
+TARGET	&	1	&	0	&	0	&	0	&	0	\\
+NAME_CONTRACT_TYPE	&	Cash loans	&	Cash loans	&	Revolving loans	&	Cash loans	&	Cash loans	\\
+CODE_GENDER	&	M	&	F	&	M	&	F	&	M	\\
+FLAG_OWN_CAR	&	N	&	N	&	Y	&	N	&	N	\\
+FLAG_OWN_REALTY	&	Y	&	N	&	Y	&	Y	&	Y	\\
+CNT_CHILDREN	&	0	&	0	&	0	&	0	&	0	\\
+AMT_INCOME_TOTAL	&	202500	&	270000	&	67500	&	135000	&	121500	\\
+AMT_CREDIT	&	406598	&	1.29E+06	&	135000	&	312682	&	513000	\\
+AMT_ANNUITY	&	24700.5	&	35698.5	&	6750	&	29686.5	&	21865.5	\\
+AMT_GOODS_PRICE	&	351000	&	1.13E+06	&	135000	&	297000	&	513000	\\
+NAME_TYPE_SUITE	&	Unaccompanied	&	Family	&	Unaccompanied	&	Unaccompanied	&	Unaccompanied	\\
+NAME_INCOME_TYPE	&	Working	&	State servant	&	Working	&	Working	&	Working	\\
+NAME_EDUCATION_TYPE	&	Secondary / secondary special	&	Higher education	&	Secondary / secondary special	&	Secondary / secondary special	&	Secondary / secondary special	\\
+NAME_FAMILY_STATUS	&	Single / not married	&	Married	&	Single / not married	&	Civil marriage	&	Single / not married	\\
+NAME_HOUSING_TYPE	&	House / apartment	&	House / apartment	&	House / apartment	&	House / apartment	&	House / apartment	\\
+REGION_POPULATION_RELATIVE	&	0.018801	&	0.003541	&	0.010032	&	0.008019	&	0.028663	\\
+DAYS_BIRTH	&	-9461	&	-16765	&	-19046	&	-19005	&	-19932	\\
+DAYS_EMPLOYED	&	-637	&	-1188	&	-225	&	-3039	&	-3038	\\
+DAYS_REGISTRATION	&	-3648	&	-1186	&	-4260	&	-9833	&	-4311	\\
+DAYS_ID_PUBLISH	&	-2120	&	-291	&	-2531	&	-2437	&	-3458	\\
+OWN_CAR_AGE	&	NaN	&	NaN	&	26	&	NaN	&	NaN	\\
+FLAG_MOBIL	&	1	&	1	&	1	&	1	&	1	\\
+FLAG_EMP_PHONE	&	1	&	1	&	1	&	1	&	1	\\
+FLAG_WORK_PHONE	&	0	&	0	&	1	&	0	&	0	\\
+FLAG_CONT_MOBILE	&	1	&	1	&	1	&	1	&	1	\\
+FLAG_PHONE	&	1	&	1	&	1	&	0	&	0	\\
+FLAG_EMAIL	&	0	&	0	&	0	&	0	&	0	\\
+OCCUPATION_TYPE	&	Laborers	&	Core staff	&	Laborers	&	Laborers	&	Core staff	\\
+CNT_FAM_MEMBERS	&	1	&	2	&	1	&	2	&	1	\\
+REGION_RATING_CLIENT	&	2	&	1	&	2	&	2	&	2	\\
+REGION_RATING_CLIENT_W_CITY	&	2	&	1	&	2	&	2	&	2	\\
+WEEKDAY_APPR_PROCESS_START	&	WEDNESDAY	&	MONDAY	&	MONDAY	&	WEDNESDAY	&	THURSDAY	\\
+HOUR_APPR_PROCESS_START	&	10	&	11	&	9	&	17	&	11	\\
+REG_REGION_NOT_LIVE_REGION	&	0	&	0	&	0	&	0	&	0	\\
+REG_REGION_NOT_WORK_REGION	&	0	&	0	&	0	&	0	&	0	\\
+LIVE_REGION_NOT_WORK_REGION	&	0	&	0	&	0	&	0	&	0	\\
+REG_CITY_NOT_LIVE_CITY	&	0	&	0	&	0	&	0	&	0	\\
+REG_CITY_NOT_WORK_CITY	&	0	&	0	&	0	&	0	&	1	\\
+LIVE_CITY_NOT_WORK_CITY	&	0	&	0	&	0	&	0	&	1	\\
+ORGANIZATION_TYPE	&	Business Entity Type 3	&	School	&	Government	&	Business Entity Type 3	&	Religion	\\
+EXT_SOURCE_1	&	0.083037	&	0.311267	&	NaN	&	NaN	&	NaN	\\
+EXT_SOURCE_2	&	0.262949	&	0.622246	&	0.555912	&	0.650442	&	0.322738	\\
+EXT_SOURCE_3	&	0.139376	&	NaN	&	0.729567	&	NaN	&	NaN	\\
+APARTMENTS_AVG	&	0.0247	&	0.0959	&	NaN	&	NaN	&	NaN	\\
+BASEMENTAREA_AVG	&	0.0369	&	0.0529	&	NaN	&	NaN	&	NaN	\\
+YEARS_BEGINEXPLUATATION_AVG	&	0.9722	&	0.9851	&	NaN	&	NaN	&	NaN	\\
+YEARS_BUILD_AVG	&	0.6192	&	0.796	&	NaN	&	NaN	&	NaN	\\
+COMMONAREA_AVG	&	0.0143	&	0.0605	&	NaN	&	NaN	&	NaN	\\
+ELEVATORS_AVG	&	0	&	0.08	&	NaN	&	NaN	&	NaN	\\
+ENTRANCES_AVG	&	0.069	&	0.0345	&	NaN	&	NaN	&	NaN	\\
+FLOORSMAX_AVG	&	0.0833	&	0.2917	&	NaN	&	NaN	&	NaN	\\
+FLOORSMIN_AVG	&	0.125	&	0.3333	&	NaN	&	NaN	&	NaN	\\
+LANDAREA_AVG	&	0.0369	&	0.013	&	NaN	&	NaN	&	NaN	\\
+LIVINGAPARTMENTS_AVG	&	0.0202	&	0.0773	&	NaN	&	NaN	&	NaN	\\
+LIVINGAREA_AVG	&	0.019	&	0.0549	&	NaN	&	NaN	&	NaN	\\
+NONLIVINGAPARTMENTS_AVG	&	0	&	0.0039	&	NaN	&	NaN	&	NaN	\\
+NONLIVINGAREA_AVG	&	0	&	0.0098	&	NaN	&	NaN	&	NaN	\\
+APARTMENTS_MODE	&	0.0252	&	0.0924	&	NaN	&	NaN	&	NaN	\\
+BASEMENTAREA_MODE	&	0.0383	&	0.0538	&	NaN	&	NaN	&	NaN	\\
+YEARS_BEGINEXPLUATATION_MODE	&	0.9722	&	0.9851	&	NaN	&	NaN	&	NaN	\\
+YEARS_BUILD_MODE	&	0.6341	&	0.804	&	NaN	&	NaN	&	NaN	\\
+COMMONAREA_MODE	&	0.0144	&	0.0497	&	NaN	&	NaN	&	NaN	\\
+ELEVATORS_MODE	&	0	&	0.0806	&	NaN	&	NaN	&	NaN	\\
+ENTRANCES_MODE	&	0.069	&	0.0345	&	NaN	&	NaN	&	NaN	\\
+FLOORSMAX_MODE	&	0.0833	&	0.2917	&	NaN	&	NaN	&	NaN	\\
+FLOORSMIN_MODE	&	0.125	&	0.3333	&	NaN	&	NaN	&	NaN	\\
+LANDAREA_MODE	&	0.0377	&	0.0128	&	NaN	&	NaN	&	NaN	\\
+LIVINGAPARTMENTS_MODE	&	0.022	&	0.079	&	NaN	&	NaN	&	NaN	\\
+LIVINGAREA_MODE	&	0.0198	&	0.0554	&	NaN	&	NaN	&	NaN	\\
+NONLIVINGAPARTMENTS_MODE	&	0	&	0	&	NaN	&	NaN	&	NaN	\\
+NONLIVINGAREA_MODE	&	0	&	0	&	NaN	&	NaN	&	NaN	\\
+APARTMENTS_MEDI	&	0.025	&	0.0968	&	NaN	&	NaN	&	NaN	\\
+BASEMENTAREA_MEDI	&	0.0369	&	0.0529	&	NaN	&	NaN	&	NaN	\\
+YEARS_BEGINEXPLUATATION_MEDI	&	0.9722	&	0.9851	&	NaN	&	NaN	&	NaN	\\
+YEARS_BUILD_MEDI	&	0.6243	&	0.7987	&	NaN	&	NaN	&	NaN	\\
+COMMONAREA_MEDI	&	0.0144	&	0.0608	&	NaN	&	NaN	&	NaN	\\
+ELEVATORS_MEDI	&	0	&	0.08	&	NaN	&	NaN	&	NaN	\\
+ENTRANCES_MEDI	&	0.069	&	0.0345	&	NaN	&	NaN	&	NaN	\\
+FLOORSMAX_MEDI	&	0.0833	&	0.2917	&	NaN	&	NaN	&	NaN	\\
+FLOORSMIN_MEDI	&	0.125	&	0.3333	&	NaN	&	NaN	&	NaN	\\
+LANDAREA_MEDI	&	0.0375	&	0.0132	&	NaN	&	NaN	&	NaN	\\
+LIVINGAPARTMENTS_MEDI	&	0.0205	&	0.0787	&	NaN	&	NaN	&	NaN	\\
+LIVINGAREA_MEDI	&	0.0193	&	0.0558	&	NaN	&	NaN	&	NaN	\\
+NONLIVINGAPARTMENTS_MEDI	&	0	&	0.0039	&	NaN	&	NaN	&	NaN	\\
+NONLIVINGAREA_MEDI	&	0	&	0.01	&	NaN	&	NaN	&	NaN	\\
+FONDKAPREMONT_MODE	&	reg oper account	&	reg oper account	&	NaN	&	NaN	&	NaN	\\
+HOUSETYPE_MODE	&	block of flats	&	block of flats	&	NaN	&	NaN	&	NaN	\\
+TOTALAREA_MODE	&	0.0149	&	0.0714	&	NaN	&	NaN	&	NaN	\\
+WALLSMATERIAL_MODE	&	Stone, brick	&	Block	&	NaN	&	NaN	&	NaN	\\
+EMERGENCYSTATE_MODE	&	No	&	No	&	NaN	&	NaN	&	NaN	\\
+OBS_30_CNT_SOCIAL_CIRCLE	&	2	&	1	&	0	&	2	&	0	\\
+DEF_30_CNT_SOCIAL_CIRCLE	&	2	&	0	&	0	&	0	&	0	\\
+OBS_60_CNT_SOCIAL_CIRCLE	&	2	&	1	&	0	&	2	&	0	\\
+DEF_60_CNT_SOCIAL_CIRCLE	&	2	&	0	&	0	&	0	&	0	\\
+DAYS_LAST_PHONE_CHANGE	&	-1134	&	-828	&	-815	&	-617	&	-1106	\\
+FLAG_DOCUMENT_2	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_3	&	1	&	1	&	0	&	1	&	0	\\
+FLAG_DOCUMENT_4	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_5	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_6	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_7	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_8	&	0	&	0	&	0	&	0	&	1	\\
+FLAG_DOCUMENT_9	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_10	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_11	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_12	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_13	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_14	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_15	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_16	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_17	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_18	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_19	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_20	&	0	&	0	&	0	&	0	&	0	\\
+FLAG_DOCUMENT_21	&	0	&	0	&	0	&	0	&	0	\\
+AMT_REQ_CREDIT_BUREAU_HOUR	&	0	&	0	&	0	&	NaN	&	0	\\
+AMT_REQ_CREDIT_BUREAU_DAY	&	0	&	0	&	0	&	NaN	&	0	\\
+AMT_REQ_CREDIT_BUREAU_WEEK	&	0	&	0	&	0	&	NaN	&	0	\\
+AMT_REQ_CREDIT_BUREAU_MON	&	0	&	0	&	0	&	NaN	&	0	\\
+AMT_REQ_CREDIT_BUREAU_QRT	&	0	&	0	&	0	&	NaN	&	0	\\
+AMT_REQ_CREDIT_BUREAU_YEAR	&	1	&	0	&	0	&	NaN	&	0	\\
+\end{longtable}
+}
+\normalsize
+
+\subsection{Bureau Data Table Samples (bureau.csv)}
+\label{appendix:bureaudatatablesamples}
+
+\tiny
+\definecolor{lightgray}{gray}{0.92}
+{\rowcolors{2}{white}{lightgray}
+\begin{longtable}[c]{| l || p{2cm} | p{2cm} | p{2cm} | p{2cm} | p{2cm} |}
+
+ \caption{Bureau Data Table Samples\label{bureaudatatablesamples}}\\
+
+ \hline
+ \rowcolor{white} \multicolumn{6}{| c |}{\textbf{bureau.csv Samples}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Index 0} & \textbf{Index 1} & \textbf{Index 2} & \textbf{Index 3} & \textbf{Index 4}\\
+ \hline
+ \endfirsthead
+
+ \rowcolor{white} \caption[]{Bureau Data Table Samples (continued)}\\
+ \rowcolor{white} \hline
+ \rowcolor{white} \multicolumn{6}{|c|}{\textbf{bureau.csv Samples}\ref{bureaudatatablesamples}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{Index 0} & \textbf{Index 1} & \textbf{Index 2} & \textbf{Index 3} & \textbf{Index 4}\\
+ \hline
+ \endhead
+
+ \hline
+ \endfoot
+
+ \hline
+ \endlastfoot
+
+ SK_ID_CURR	&	215354	&	215354	&	215354	&	215354	&	215354	\\
+SK_ID_BUREAU	&	5714462	&	5714463	&	5714464	&	5714465	&	5714466	\\
+CREDIT_ACTIVE	&	Closed	&	Active	&	Active	&	Active	&	Active	\\
+CREDIT_CURRENCY	&	currency 1	&	currency 1	&	currency 1	&	currency 1	&	currency 1	\\
+DAYS_CREDIT	&	-497	&	-208	&	-203	&	-203	&	-629	\\
+CREDIT_DAY_OVERDUE	&	0	&	0	&	0	&	0	&	0	\\
+DAYS_CREDIT_ENDDATE	&	-153	&	1075	&	528	&	NaN	&	1197	\\
+DAYS_ENDDATE_FACT	&	-153	&	NaN	&	NaN	&	NaN	&	NaN	\\
+AMT_CREDIT_MAX_OVERDUE	&	NaN	&	NaN	&	NaN	&	NaN	&	77674.5	\\
+CNT_CREDIT_PROLONG	&	0	&	0	&	0	&	0	&	0	\\
+AMT_CREDIT_SUM	&	91323	&	225000	&	464324	&	90000	&	2.70E+06	\\
+AMT_CREDIT_SUM_DEBT	&	0	&	171342	&	NaN	&	NaN	&	NaN	\\
+AMT_CREDIT_SUM_LIMIT	&	NaN	&	NaN	&	NaN	&	NaN	&	NaN	\\
+AMT_CREDIT_SUM_OVERDUE	&	0	&	0	&	0	&	0	&	0	\\
+CREDIT_TYPE	&	Consumer credit	&	Credit card	&	Consumer credit	&	Credit card	&	Consumer credit	\\
+DAYS_CREDIT_UPDATE	&	-131	&	-20	&	-16	&	-16	&	-21	\\
+AMT_ANNUITY	&	NaN	&	NaN	&	NaN	&	NaN	&	NaN	\\
+\end{longtable}
+}
+\normalsize
+
+\section{Main Data Table `NaN' Entry Statistical Summary}
+\label{appendix:maindatatablenanstatsummary}
+
+\tiny
+\definecolor{lightgray}{gray}{0.92}
+{\rowcolors{2}{white}{lightgray}
+\begin{longtable}[c]{| l || Rm{1.3cm} | Rm{1.3cm} | Rm{1.3cm} | Rm{1.3cm} | Rm{1.3cm} | Rm{1.3cm} | Rm{1.3cm} |}
+
+ \caption{Main Data Table `NaN' Entry Statistical Summary\label{maindatatablenanstatsummary}}\\
+
+ \hline
+ \rowcolor{white} \multicolumn{8}{| c |}{\textbf{application_train.csv `NaN' Entries}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{\# NaN Entries} & \textbf{Fraction of Entries NaN} & \textbf{\# NaN Entries Target=1} & \textbf{Fraction of NaN Entries Target=1} & \textbf{\# non-NaN Entries} & \textbf{\# non-NaN Entries Target=1} & \textbf{Fraction of non-NaN Entries Target=1}\\
+ \hline
+ \endfirsthead
+
+ \rowcolor{white} \caption[]{Main Data Table `NaN' Entry Statistical Summary (continued)}\\
+ \rowcolor{white} \hline
+ \rowcolor{white} \multicolumn{8}{|c|}{\textbf{application_train.csv `NaN' Entries}\ref{maindatatablenanstatsummary}}\\
+ \hline
+ \rowcolor{white} \textbf{Feature} & \textbf{\# NaN Entries} & \textbf{Fraction of Entries NaN} & \textbf{\# NaN Entries Target=1} & \textbf{Fraction of NaN Entries Target=1} & \textbf{\# non-NaN Entries} & \textbf{\# non-NaN Entries Target=1} & \textbf{Fraction of non-NaN Entries Target=1}\\
+ \hline
+ \endhead
+
+ \hline
+ \endfoot
+
+ \hline
+ \endlastfoot
+
+ COMMONAREA_MEDI	&	214865	&	0.6987	&	18423	&	0.0857	&	92646	&	6402	&	0.0857	\\
+COMMONAREA_AVG	&	214865	&	0.6987	&	18423	&	0.0857	&	92646	&	6402	&	0.0857	\\
+COMMONAREA_MODE	&	214865	&	0.6987	&	18423	&	0.0857	&	92646	&	6402	&	0.0857	\\
+NONLIVINGAPARTMENTS_MODE	&	213514	&	0.6943	&	18327	&	0.0858	&	93997	&	6498	&	0.0858	\\
+NONLIVINGAPARTMENTS_MEDI	&	213514	&	0.6943	&	18327	&	0.0858	&	93997	&	6498	&	0.0858	\\
+NONLIVINGAPARTMENTS_AVG	&	213514	&	0.6943	&	18327	&	0.0858	&	93997	&	6498	&	0.0858	\\
+FONDKAPREMONT_MODE	&	210295	&	0.6839	&	18125	&	0.0862	&	97216	&	6700	&	0.0862	\\
+LIVINGAPARTMENTS_MEDI	&	210199	&	0.6835	&	18122	&	0.0862	&	97312	&	6703	&	0.0862	\\
+LIVINGAPARTMENTS_MODE	&	210199	&	0.6835	&	18122	&	0.0862	&	97312	&	6703	&	0.0862	\\
+LIVINGAPARTMENTS_AVG	&	210199	&	0.6835	&	18122	&	0.0862	&	97312	&	6703	&	0.0862	\\
+FLOORSMIN_MEDI	&	208642	&	0.6785	&	18008	&	0.0863	&	98869	&	6817	&	0.0863	\\
+FLOORSMIN_MODE	&	208642	&	0.6785	&	18008	&	0.0863	&	98869	&	6817	&	0.0863	\\
+FLOORSMIN_AVG	&	208642	&	0.6785	&	18008	&	0.0863	&	98869	&	6817	&	0.0863	\\
+YEARS_BUILD_MEDI	&	204488	&	0.665	&	17751	&	0.0868	&	103023	&	7074	&	0.0868	\\
+YEARS_BUILD_AVG	&	204488	&	0.665	&	17751	&	0.0868	&	103023	&	7074	&	0.0868	\\
+YEARS_BUILD_MODE	&	204488	&	0.665	&	17751	&	0.0868	&	103023	&	7074	&	0.0868	\\
+OWN_CAR_AGE	&	202929	&	0.6599	&	17249	&	0.085	&	104582	&	7576	&	0.085	\\
+LANDAREA_MODE	&	182590	&	0.5938	&	16104	&	0.0882	&	124921	&	8721	&	0.0882	\\
+LANDAREA_AVG	&	182590	&	0.5938	&	16104	&	0.0882	&	124921	&	8721	&	0.0882	\\
+LANDAREA_MEDI	&	182590	&	0.5938	&	16104	&	0.0882	&	124921	&	8721	&	0.0882	\\
+BASEMENTAREA_MEDI	&	179943	&	0.5852	&	16038	&	0.0891	&	127568	&	8787	&	0.0891	\\
+BASEMENTAREA_AVG	&	179943	&	0.5852	&	16038	&	0.0891	&	127568	&	8787	&	0.0891	\\
+BASEMENTAREA_MODE	&	179943	&	0.5852	&	16038	&	0.0891	&	127568	&	8787	&	0.0891	\\
+EXT_SOURCE_1	&	173378	&	0.5638	&	14771	&	0.0852	&	134133	&	10054	&	0.0852	\\
+NONLIVINGAREA_MEDI	&	169682	&	0.5518	&	15330	&	0.0903	&	137829	&	9495	&	0.0903	\\
+NONLIVINGAREA_AVG	&	169682	&	0.5518	&	15330	&	0.0903	&	137829	&	9495	&	0.0903	\\
+NONLIVINGAREA_MODE	&	169682	&	0.5518	&	15330	&	0.0903	&	137829	&	9495	&	0.0903	\\
+ELEVATORS_MODE	&	163891	&	0.533	&	14915	&	0.091	&	143620	&	9910	&	0.091	\\
+ELEVATORS_AVG	&	163891	&	0.533	&	14915	&	0.091	&	143620	&	9910	&	0.091	\\
+ELEVATORS_MEDI	&	163891	&	0.533	&	14915	&	0.091	&	143620	&	9910	&	0.091	\\
+WALLSMATERIAL_MODE	&	156341	&	0.5084	&	14271	&	0.0913	&	151170	&	10554	&	0.0913	\\
+APARTMENTS_MODE	&	156061	&	0.5075	&	14285	&	0.0915	&	151450	&	10540	&	0.0915	\\
+APARTMENTS_AVG	&	156061	&	0.5075	&	14285	&	0.0915	&	151450	&	10540	&	0.0915	\\
+APARTMENTS_MEDI	&	156061	&	0.5075	&	14285	&	0.0915	&	151450	&	10540	&	0.0915	\\
+ENTRANCES_MEDI	&	154828	&	0.5035	&	14211	&	0.0918	&	152683	&	10614	&	0.0918	\\
+ENTRANCES_MODE	&	154828	&	0.5035	&	14211	&	0.0918	&	152683	&	10614	&	0.0918	\\
+ENTRANCES_AVG	&	154828	&	0.5035	&	14211	&	0.0918	&	152683	&	10614	&	0.0918	\\
+LIVINGAREA_MEDI	&	154350	&	0.5019	&	14111	&	0.0914	&	153161	&	10714	&	0.0914	\\
+LIVINGAREA_MODE	&	154350	&	0.5019	&	14111	&	0.0914	&	153161	&	10714	&	0.0914	\\
+LIVINGAREA_AVG	&	154350	&	0.5019	&	14111	&	0.0914	&	153161	&	10714	&	0.0914	\\
+HOUSETYPE_MODE	&	154297	&	0.5018	&	14120	&	0.0915	&	153214	&	10705	&	0.0915	\\
+FLOORSMAX_MODE	&	153020	&	0.4976	&	14064	&	0.0919	&	154491	&	10761	&	0.0919	\\
+FLOORSMAX_MEDI	&	153020	&	0.4976	&	14064	&	0.0919	&	154491	&	10761	&	0.0919	\\
+FLOORSMAX_AVG	&	153020	&	0.4976	&	14064	&	0.0919	&	154491	&	10761	&	0.0919	\\
+YEARS_BEGINEXPLUATATION_MEDI	&	150007	&	0.4878	&	13808	&	0.092	&	157504	&	11017	&	0.092	\\
+YEARS_BEGINEXPLUATATION_AVG	&	150007	&	0.4878	&	13808	&	0.092	&	157504	&	11017	&	0.092	\\
+YEARS_BEGINEXPLUATATION_MODE	&	150007	&	0.4878	&	13808	&	0.092	&	157504	&	11017	&	0.092	\\
+TOTALAREA_MODE	&	148431	&	0.4827	&	13706	&	0.0923	&	159080	&	11119	&	0.0923	\\
+EMERGENCYSTATE_MODE	&	145755	&	0.474	&	13498	&	0.0926	&	161756	&	11327	&	0.0926	\\
+OCCUPATION_TYPE	&	96391	&	0.3135	&	6278	&	0.0651	&	211120	&	18547	&	0.0651	\\
+EXT_SOURCE_3	&	60965	&	0.1983	&	5677	&	0.0931	&	246546	&	19148	&	0.0931	\\
+AMT_REQ_CREDIT_BUREAU_QRT	&	41519	&	0.135	&	4292	&	0.1034	&	265992	&	20533	&	0.1034	\\
+AMT_REQ_CREDIT_BUREAU_YEAR	&	41519	&	0.135	&	4292	&	0.1034	&	265992	&	20533	&	0.1034	\\
+AMT_REQ_CREDIT_BUREAU_WEEK	&	41519	&	0.135	&	4292	&	0.1034	&	265992	&	20533	&	0.1034	\\
+AMT_REQ_CREDIT_BUREAU_MON	&	41519	&	0.135	&	4292	&	0.1034	&	265992	&	20533	&	0.1034	\\
+AMT_REQ_CREDIT_BUREAU_DAY	&	41519	&	0.135	&	4292	&	0.1034	&	265992	&	20533	&	0.1034	\\
+AMT_REQ_CREDIT_BUREAU_HOUR	&	41519	&	0.135	&	4292	&	0.1034	&	265992	&	20533	&	0.1034	\\
+NAME_TYPE_SUITE	&	1292	&	0.0042	&	70	&	0.0542	&	306219	&	24755	&	0.0542	\\
+OBS_30_CNT_SOCIAL_CIRCLE	&	1021	&	0.0033	&	36	&	0.0353	&	306490	&	24789	&	0.0353	\\
+OBS_60_CNT_SOCIAL_CIRCLE	&	1021	&	0.0033	&	36	&	0.0353	&	306490	&	24789	&	0.0353	\\
+DEF_60_CNT_SOCIAL_CIRCLE	&	1021	&	0.0033	&	36	&	0.0353	&	306490	&	24789	&	0.0353	\\
+DEF_30_CNT_SOCIAL_CIRCLE	&	1021	&	0.0033	&	36	&	0.0353	&	306490	&	24789	&	0.0353	\\
+EXT_SOURCE_2	&	660	&	0.0021	&	52	&	0.0788	&	306851	&	24773	&	0.0788	\\
+AMT_GOODS_PRICE	&	278	&	0.0009	&	21	&	0.0755	&	307233	&	24804	&	0.0755	\\
+AMT_ANNUITY	&	12	&	0	&	0	&	0	&	307499	&	24825	&	0	\\
+CNT_FAM_MEMBERS	&	2	&	0	&	0	&	0	&	307509	&	24825	&	0	\\
+DAYS_LAST_PHONE_CHANGE	&	1	&	0	&	0	&	0	&	307510	&	24825	&	0	\\
+\end{longtable}
+}
+\normalsize
+
+\section{Main Data Table Feature Types}
+\label{appendix:maindatatablefeaturetypes}
+I divided the main data table's 120 features into groups based both on whether the feature is categorical or numerical, and then subdivided these groups based on how the feature would need to be preprocessed. ie. has the feature already been normalized, has it already been one-hot encoded, etc. Features that contain at least one `NaN' value are highlighted in red.
+
+\subsection{Categorical features needing one-hot encoding}
+\label{catfeatneedonehotencoding}
+\footnotesize
+\begin{enumerate}
+  \item NAME_CONTRACT_TYPE
+  \item CODE_GENDER
+  \item FLAG_OWN_CAR
+  \item FLAG_OWN_REALTY
+  \item NAME_INCOME_TYPE
+  \item NAME_EDUCATION_TYPE
+  \item NAME_FAMILY_STATUS
+  \item NAME_HOUSING_TYPE
+  \item REGION_RATING_CLIENT
+  \item REGION_RATING_CLIENT_W_CITY
+  \item WEEKDAY_APPR_PROCESS_START
+  \item ORGANIZATION_TYPE
+  \item \textcolor{red}{NAME_TYPE_SUITE (1,292 `NaN' entries)}
+  \item \textcolor{red}{OCCUPATION_TYPE (96,391 `NaN' entries)}
+\end{enumerate}
+\normalsize
+
+\subsection{Categorical features needing one-hot encoding after re-engineering their category definitions}
+\label{catfeatneedreengineering}
+\footnotesize
+\begin{enumerate}
+ \item CNT_CHILDREN (having no children vs. at least one child)
+ \item \textcolor{red}{CNT_FAM_MEMBERS (family size of 1 vs. 2 vs. 3 or more) (2 `NaN' entries)}
+\end{enumerate}
+\normalsize
+
+\subsection{Categorical features originally mis-identified by Home Credit as normalized (they also need to be one-hot encoded)}
+\label{catfeatorigmisidentified}
+\footnotesize
+\begin{enumerate}
+ \item \textcolor{red}{EMERGENCYSTATE_MODE (145,755 `NaN' entries)}
+ \item \textcolor{red}{TOTALAREA_MODE (148,431 `NaN' entries)}
+ \item \textcolor{red}{HOUSETYPE_MODE (154,297 `NaN' entries)}
+ \item \textcolor{red}{WALLSMATERIAL_MODE (156,341 `NaN' entries)}
+ \item \textcolor{red}{FONDKAPREMONT_MODE (210,295 `NaN' entries)}
+\end{enumerate}
+\normalsize
+
+\subsection{Categorical features already one-hot encoded}
+\label{catfeatalreadyonehotencoded}
+\footnotesize
+\begin{enumerate}
+ \item FLAG_MOBIL
+ \item FLAG_EMP_PHONE
+ \item FLAG_WORK_PHONE
+ \item FLAG_CONT_MOBILE
+ \item FLAG_PHONE
+ \item FLAG_EMAIL
+ \item REG_REGION_NOT_LIVE_REGION
+ \item REG_REGION_NOT_WORK_REGION
+ \item LIVE_REGION_NOT_WORK_REGION
+ \item REG_CITY_NOT_LIVE_CITY
+ \item REG_CITY_NOT_WORK_CITY
+ \item LIVE_CITY_NOT_WORK_CITY
+ \item FLAG_DOCUMENT_2
+ \item FLAG_DOCUMENT_3
+ \item FLAG_DOCUMENT_4
+ \item FLAG_DOCUMENT_5
+ \item FLAG_DOCUMENT_6
+ \item FLAG_DOCUMENT_7
+ \item FLAG_DOCUMENT_8
+ \item FLAG_DOCUMENT_9
+ \item FLAG_DOCUMENT_10
+ \item FLAG_DOCUMENT_11
+ \item FLAG_DOCUMENT_12
+ \item FLAG_DOCUMENT_13
+ \item FLAG_DOCUMENT_14
+ \item FLAG_DOCUMENT_15
+ \item FLAG_DOCUMENT_16
+ \item FLAG_DOCUMENT_17
+ \item FLAG_DOCUMENT_18
+ \item FLAG_DOCUMENT_19
+ \item FLAG_DOCUMENT_20
+ \item FLAG_DOCUMENT_21
+\end{enumerate}
+\normalsize
+
+\subsection{Numerical features not identified as normalized}
+\label{numericalfeatnotnormalized}
+\footnotesize
+\begin{enumerate}
+ \item AMT_INCOME_TOTAL
+ \item AMT_CREDIT
+ \item DAYS_BIRTH
+ \item DAYS_EMPLOYED
+ \item DAYS_REGISTRATION
+ \item DAYS_ID_PUBLISH
+ \item HOUR_APPR_PROCESS_START
+ \item \textcolor{red}{DAYS_LAST_PHONE_CHANGE (1 `NaN' entry)}
+ \item \textcolor{red}{AMT_ANNUITY (12 `NaN' entries)}
+ \item \textcolor{red}{AMT_GOODS_PRICE (278 `NaN' entries)}
+ \item \textcolor{red}{OBS_30_CNT_SOCIAL_CIRCLE (1,021 `NaN' entries)}
+ \item \textcolor{red}{DEF_30_CNT_SOCIAL_CIRCLE (1,021 `NaN' entries)}
+ \item \textcolor{red}{OBS_60_CNT_SOCIAL_CIRCLE (1,021 `NaN' entries)}
+ \item \textcolor{red}{DEF_60_CNT_SOCIAL_CIRCLE (1,021 `NaN' entries)}
+ \item \textcolor{red}{AMT_REQ_CREDIT_BUREAU_HOUR (41,519 `NaN' entries)}
+ \item \textcolor{red}{AMT_REQ_CREDIT_BUREAU_DAY (41,519 `NaN' entries)}
+ \item \textcolor{red}{AMT_REQ_CREDIT_BUREAU_WEEK (41,519 `NaN' entries)}
+ \item \textcolor{red}{AMT_REQ_CREDIT_BUREAU_MON (41,519 `NaN' entries)}
+ \item \textcolor{red}{AMT_REQ_CREDIT_BUREAU_QRT (41,519 `NaN' entries)}
+ \item \textcolor{red}{AMT_REQ_CREDIT_BUREAU_YEAR (41,519 `NaN' entries)}
+ \item \textcolor{red}{OWN_CAR_AGE (202,929 `NaN' entries)}
+\end{enumerate}
+\normalsize
+
+\subsection{Numerical features identified as normalized}
+\label{numericalfeatnormalized}
+\footnotesize
+\begin{enumerate}
+ \item REGION_POPULATION_RELATIVE
+ \item \textcolor{red}{EXT_SOURCE_2 (660 `NaN' entries)}
+ \item \textcolor{red}{EXT_SOURCE_3 (60,965 `NaN' entries)}
+ \item \textcolor{red}{YEARS_BEGINEXPLUATATION_AVG (150,007 `NaN' entries)}
+ \item \textcolor{red}{YEARS_BEGINEXPLUATATION_MODE (150,007 `NaN' entries)}
+ \item \textcolor{red}{YEARS_BEGINEXPLUATATION_MEDI (150,007 `NaN' entries)}
+ \item \textcolor{red}{FLOORSMAX_AVG (153,020 `NaN' entries)}
+ \item \textcolor{red}{FLOORSMAX_MODE (153,020 `NaN' entries)}
+ \item \textcolor{red}{FLOORSMAX_MEDI (153,020 `NaN' entries)}
+ \item \textcolor{red}{LIVINGAREA_AVG (154,350 `NaN' entries)}
+ \item \textcolor{red}{LIVINGAREA_MODE (154,350 `NaN' entries)}
+ \item \textcolor{red}{LIVINGAREA_MEDI (154,350 `NaN' entries)}
+ \item \textcolor{red}{ENTRANCES_AVG (154,828 `NaN' entries)}
+ \item \textcolor{red}{ENTRANCES_MODE (154,828 `NaN' entries)}
+ \item \textcolor{red}{ENTRANCES_MEDI (154,828 `NaN' entries)}
+ \item \textcolor{red}{APARTMENTS_AVG (156,061 `NaN' entries)}
+ \item \textcolor{red}{APARTMENTS_MODE (156,061 `NaN' entries)}
+ \item \textcolor{red}{APARTMENTS_MEDI (156,061 `NaN' entries)}
+ \item \textcolor{red}{ELEVATORS_AVG (163,891 `NaN' entries)}
+ \item \textcolor{red}{ELEVATORS_MODE (163,891 `NaN' entries)}
+ \item \textcolor{red}{ELEVATORS_MEDI (163,891 `NaN' entries)}
+ \item \textcolor{red}{NONLIVINGAREA_AVG (169,682 `NaN' entries)}
+ \item \textcolor{red}{NONLIVINGAREA_MODE (169,682 `NaN' entries)}
+ \item \textcolor{red}{NONLIVINGAREA_MEDI (169,682 `NaN' entries)}
+ \item \textcolor{red}{EXT_SOURCE_1 (173,378 `NaN' entries)}
+ \item \textcolor{red}{BASEMENTAREA_AVG (179,943 `NaN' entries)}
+ \item \textcolor{red}{BASEMENTAREA_MODE (179,943 `NaN' entries)}
+ \item \textcolor{red}{BASEMENTAREA_MEDI (179,943 `NaN' entries)}
+ \item \textcolor{red}{LANDAREA_AVG (182,590 `NaN' entries)}
+ \item \textcolor{red}{LANDAREA_MODE (182,590 `NaN' entries)}
+ \item \textcolor{red}{LANDAREA_MEDI (182,590 `NaN' entries)}
+ \item \textcolor{red}{YEARS_BUILD_AVG (204,488 `NaN' entries)}
+ \item \textcolor{red}{YEARS_BUILD_MODE (204,488 `NaN' entries)}
+ \item \textcolor{red}{YEARS_BUILD_MEDI (204,488 `NaN' entries)}
+ \item \textcolor{red}{FLOORSMIN_AVG (208,642 `NaN' entries)}
+ \item \textcolor{red}{FLOORSMIN_MODE (208,642 `NaN' entries)}
+ \item \textcolor{red}{FLOORSMIN_MEDI (208,642 `NaN' entries)}
+ \item \textcolor{red}{LIVINGAPARTMENTS_AVG (210,199 `NaN' entries)}
+ \item \textcolor{red}{LIVINGAPARTMENTS_MODE (210,199 `NaN' entries)}
+ \item \textcolor{red}{LIVINGAPARTMENTS_MEDI (210,199 `NaN' entries)}
+ \item \textcolor{red}{NONLIVINGAPARTMENTS_AVG (213,514 `NaN' entries)}
+ \item \textcolor{red}{NONLIVINGAPARTMENTS_MODE (213,514 `NaN' entries)}
+ \item \textcolor{red}{NONLIVINGAPARTMENTS_MEDI (213,514 `NaN' entries)}
+ \item \textcolor{red}{COMMONAREA_AVG (214,865 `NaN' entries)}
+ \item \textcolor{red}{COMMONAREA_MODE (214,865 `NaN' entries)}
+ \item \textcolor{red}{COMMONAREA_MEDI (214,865 `NaN' entries)}
+\end{enumerate}
+\normalsize
+
+\pagebreak
+
+\section{Main Data Table Numerical Feature Distributions}
+\label{appendix:maindatatablefeaturedistributions}
+
+\subsection{Main Data Table Normalized Feature Distributions}
+\label{normalfeaturedistibs}
+
+\begin{figure}[ht]
+\includegraphics[width=0.89\textwidth]{main-data-table-normal-feature-distribs-p1}
+\centering
+\caption{Main Data Table Normalized Feature Distributions(1/4)}
+\end{figure}
+
+\pagebreak
+
+\begin{figure}[ht]
+\includegraphics[width=0.89\textwidth]{main-data-table-normal-feature-distribs-p2}
+\centering
+\caption{Main Data Table Normalized Feature Distributions(2/4)}
+\end{figure}
+
+\pagebreak
+
+\begin{figure}[ht]
+\includegraphics[width=0.89\textwidth]{main-data-table-normal-feature-distribs-p3}
+\centering
+\caption{Main Data Table Normalized Feature Distributions(3/4)}
+\end{figure}
+
+\pagebreak
+
+\begin{figure}[ht]
+\includegraphics[width=0.89\textwidth]{main-data-table-normal-feature-distribs-p4}
+\centering
+\caption{Main Data Table Normalized Feature Distributions(4/4)}
+\end{figure}
+
+\pagebreak
+
+\subsection{Main Data Table Non-normalized Feature Distributions}
+\label{nonnormalfeaturedistibs}
+
+\begin{figure}[ht]
+\includegraphics[width=0.89\textwidth]{main-data-table-non-normal-feature-distribs-p1}
+\centering
+\caption{Main Data Table Non-Normalized Feature Distributions(1/2)}
+\end{figure}
+
+\pagebreak
+
+\begin{figure}[ht]
+\includegraphics[width=0.89\textwidth]{main-data-table-non-normal-feature-distribs-p2}
+\centering
+\caption{Main Data Table Non-Normalized Feature Distributions(2/2)}
+\end{figure}
+
+\pagebreak
 
 \end{appendices}
 
