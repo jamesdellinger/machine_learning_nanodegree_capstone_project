@@ -4,13 +4,13 @@
 
 *Applying machine learning algorithms and techniques to solve the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on Kaggle.*
 
-### My capstone project proposal is here:
-
-https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf
-
 ### My capstone project report is here:
 
 https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf
+
+### My capstone project proposal is here:
+
+https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf
 
 ### The code for my competition solution is here:
 
