@@ -19,6 +19,36 @@
 
 \refsection{0}
   \datalist[entry]{ynt/global//global/global}
+    \entry{2017arXiv170704831Y}{article}{}
+      \name{author}{1}{}{%
+        {{hash=abd245262d9b92e28a5a75b3bae00021}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Xiaojiao},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{fullhash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{bibnamehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{authorbibnamehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{authornamehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{authorfullhash}{abd245262d9b92e28a5a75b3bae00021}
+      \field{labelalpha}{Yu17}
+      \field{sortinit}{2}
+      \field{sortinithash}{cbff857e587bcb4635511624d773949e}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{q-fin.RM}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{ArXiv e-prints}
+      \field{month}{7}
+      \field{title}{{Machine learning application in online lending risk prediction}}
+      \field{year}{2017}
+      \verb{eprint}
+      \verb 1707.04831
+      \endverb
+      \keyw{Quantitative Finance - Risk Management}
+    \endentry
     \entry{githubprojectrepo}{online}{}
       \name{author}{1}{}{%
         {{hash=713c37e9a2a4ee2c6dfc57b4bde89221}{%
@@ -160,6 +190,148 @@
       \verb https://www.kaggle.com/c/home-credit-default-risk/leaderboard
       \endverb
       \keyw{credit,default,risk,kaggle,competition,public,leaderboard}
+    \endentry
+    \entry{lightgbmdocs}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{labelalpha}{Mic}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{extraalpha}{1}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.26.2018)}
+      \field{title}{LightGBM Features}
+      \verb{urlraw}
+      \verb https://lightgbm.readthedocs.io/en/latest/Features.html#leaf-wise-best-first-tree-growth
+      \endverb
+      \verb{url}
+      \verb https://lightgbm.readthedocs.io/en/latest/Features.html#leaf-wise-best-first-tree-growth
+      \endverb
+      \keyw{LightGBM,Microsoft}
+    \endentry
+    \entry{lightgbmparams}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{labelalpha}{Mic}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.27.2018)}
+      \field{title}{LightGBM Parameters}
+      \verb{urlraw}
+      \verb https://lightgbm.readthedocs.io/en/latest/Parameters.html
+      \endverb
+      \verb{url}
+      \verb https://lightgbm.readthedocs.io/en/latest/Parameters.html
+      \endverb
+      \keyw{LightGBM,Parameters,Microsoft}
+    \endentry
+    \entry{lightgbmparamtuning}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{labelalpha}{Mic}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{extraalpha}{3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.27.2018)}
+      \field{title}{LightGBM Parameters Tuning}
+      \verb{urlraw}
+      \verb https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html
+      \endverb
+      \verb{url}
+      \verb https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html
+      \endverb
+      \keyw{LightGBM,Parameters,Microsoft}
+    \endentry
+    \entry{statsandbots}{online}{}
+      \name{author}{1}{}{%
+        {{hash=6ca3194b9672b79e26d9b0bdd0d42fc2}{%
+           family={Smolyakov},
+           familyi={S\bibinitperiod},
+           given={Vadim},
+           giveni={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{6ca3194b9672b79e26d9b0bdd0d42fc2}
+      \strng{fullhash}{6ca3194b9672b79e26d9b0bdd0d42fc2}
+      \strng{bibnamehash}{6ca3194b9672b79e26d9b0bdd0d42fc2}
+      \strng{authorbibnamehash}{6ca3194b9672b79e26d9b0bdd0d42fc2}
+      \strng{authornamehash}{6ca3194b9672b79e26d9b0bdd0d42fc2}
+      \strng{authorfullhash}{6ca3194b9672b79e26d9b0bdd0d42fc2}
+      \field{labelalpha}{Smo}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.27.2018)}
+      \field{title}{Ensemble Learning to Improve Machine Learning Results}
+      \verb{urlraw}
+      \verb https://blog.statsbot.co/ensemble-learning-d1dcd548e936
+      \endverb
+      \verb{url}
+      \verb https://blog.statsbot.co/ensemble-learning-d1dcd548e936
+      \endverb
+      \keyw{Stats,Bots,Stacking,Ensemble,Learning}
+    \endentry
+    \entry{vidhyalightgbm}{online}{}
+      \name{author}{1}{}{%
+        {{hash=3b86256e9c2117ad2222385883bae0dd}{%
+           family={Vidhya},
+           familyi={V\bibinitperiod},
+           given={Analytics},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{3b86256e9c2117ad2222385883bae0dd}
+      \strng{fullhash}{3b86256e9c2117ad2222385883bae0dd}
+      \strng{bibnamehash}{3b86256e9c2117ad2222385883bae0dd}
+      \strng{authorbibnamehash}{3b86256e9c2117ad2222385883bae0dd}
+      \strng{authornamehash}{3b86256e9c2117ad2222385883bae0dd}
+      \strng{authorfullhash}{3b86256e9c2117ad2222385883bae0dd}
+      \field{labelalpha}{Vid}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{addendum}{(accessed: 06.26.2018)}
+      \field{title}{Which algorithm takes the crown: Light GBM vs XGBOOST?}
+      \verb{urlraw}
+      \verb https://www.analyticsvidhya.com/blog/2017/06/which-algorithm-takes-the-crown-light-gbm-vs-xgboost/
+      \endverb
+      \verb{url}
+      \verb https://www.analyticsvidhya.com/blog/2017/06/which-algorithm-takes-the-crown-light-gbm-vs-xgboost/
+      \endverb
+      \keyw{LightGBM,XGBOOST,Analytics,Vidhya}
     \endentry
     \entry{mlwikirocanalysis}{online}{}
       \name{author}{1}{}{%

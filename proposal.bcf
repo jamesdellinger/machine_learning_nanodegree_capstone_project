@@ -1977,11 +1977,13 @@
     <bcf:citekey order="1">kagglehomecreditcompetitionoverview</bcf:citekey>
     <bcf:citekey order="2">homecreditwebsite</bcf:citekey>
     <bcf:citekey order="3">kagglehomecreditcompetitiondata</bcf:citekey>
-    <bcf:citekey order="4">kagglehomecreditcompetitionpublicleaderboard</bcf:citekey>
-    <bcf:citekey order="5">wikipediaroc</bcf:citekey>
-    <bcf:citekey order="6">mlwikirocanalysis</bcf:citekey>
-    <bcf:citekey order="7">kagglehomecreditcompetitiondata</bcf:citekey>
-    <bcf:citekey order="8">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="4">2017arXiv170704831Y</bcf:citekey>
+    <bcf:citekey order="5">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="6">kagglehomecreditcompetitionpublicleaderboard</bcf:citekey>
+    <bcf:citekey order="7">wikipediaroc</bcf:citekey>
+    <bcf:citekey order="8">mlwikirocanalysis</bcf:citekey>
+    <bcf:citekey order="9">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="10">kagglehomecreditcompetitiondata</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="ynt">

@@ -53,10 +53,14 @@ sorting=ynt
 
 \title{Capstone Project Report\\[8pt]
 \normalsize{Udacity Machine Learning Nanodegree}}
-\date{June 15, 2018}
+\date{June 28, 2018}
 \author{James Dellinger}
 \begin{document}
 \maketitle
+
+\begin{abstract}
+This paper explores possible approaches to solving the Home Credit Default Risk competition on Kaggle. Particular attention is placed on exploring the 120 features in Home Credit's main data table and compensating for its abundance of missing entries. Several machine learning algorithms are trained on this data and LightGBM with some hyperparameter tuning is shown have the best performance, as measured by the area under the receiver operating characteristic curve derived from its predictions on the competition's test data set.
+\end{abstract}
 
 \section{Definition}
 \subsection{Project Overview}
@@ -64,17 +68,19 @@ I want to live in a world where a second chance is available to anyone who would
 
 Home Credit's target demographic contains people who typically have no recourse but to deal with shady characters such as loan sharks when borrowing money. Many of these unbanked individuals are hard-working, well-intentioned folks who, either due to circumstances beyond their control or past mistakes, have fallen through the financial system’s cracks.
 
-Like any mainstream for-profit financial institution, Home Credit maximizes its own returns (in the form of interest payments) when it is able to lend money to as many reliable borrowers as its balance sheet allows. The only catch is that, unlike normal banks, Home Credit needs a way to guage whether a loan applicant is the kind of person who will eventually repay the loan, all without relying on traditional measures of financial reliability like credit score. I believe that machine learning is just the right tool to help Home Credit turn the information that it does have about its loan applicants into sound lending decisions. Indeed, a good machine learning algorithm could enable Home Credit to expand its services to as many more worthy customers.
+Like any mainstream for-profit financial institution, Home Credit maximizes its own returns (in the form of interest payments) when it is able to lend money to as many reliable borrowers as its balance sheet allows. The only catch is that, unlike normal banks, Home Credit needs a way to guage whether a loan applicant is the kind of person who will eventually repay the loan, all without relying on traditional measures of financial reliability like credit score. I believe that machine learning is just the right tool to help Home Credit turn the information that it does have about its loan applicants into sound lending decisions. Indeed, a good machine learning algorithm could enable Home Credit to expand its services to as many more worthy customers. To date, there has been extensive research in using machine learning algorithms to predict loan repayment outcomes, such as a 2017 paper published by Xiaojiao Yu that explores using an XGBoost model to predict online lending risk: \href{https://arxiv.org/abs/1707.04831}{Machine learning application in online lending risk prediction}\cite{2017arXiv170704831Y}.
 
 It was with all this in mind that I decided to participate in the \href{https://www.kaggle.com/c/home-credit-default-risk}{Home Credit Default Risk competition} on Kaggle\cite{kagglehomecreditcompetitionoverview} for my capstone project. The goal of the competition, which is sponsored by Home Credit, is to create an algorithm that accurately predicts the likelihood that an applicant will experience difficulty in repaying their loan.
 
-The competition's dataset was provided by Home Credit Group's data scientists. It contains a wide breadth of personal and financial information belonging to 356,255 individuals who had previously been recipients of loans from Home Credit. In this report I use the words borrower and applicant interchangeably to refer to these individuals. These individuals are divided into training and testing sets. The training group contains 307,511 individuals' records. The test group contains 48,744 records. The dataset is anonymized, with each individual represented by their loan ID. Any personally indentifying infomation, such as name, phone number, or address, has been omitted.
+The competition's dataset was provided by Home Credit Group's data scientists, and it is available for download directly from `Data' section of the competition's \href{https://www.kaggle.com/c/home-credit-default-risk/data}{Kaggle webpage}\cite{kagglehomecreditcompetitiondata}. It contains a wide breadth of personal and financial information belonging to 356,255 individuals who had previously been recipients of loans from Home Credit. In this report I use the words borrower and applicant interchangeably to refer to these individuals. These individuals are divided into training and testing sets. The training group contains 307,511 individuals' records. The test group contains 48,744 records. The dataset is anonymized, with each individual represented by their loan ID. Any personally indentifying infomation, such as name, phone number, or address, has been omitted.
 
 The dataset's features range from common characteristics, such as marital status, age, type of housing, region of residence, job type, and education level, to some incredibly niche characteristics, such as how many elevators are in an applicant's apartment building. Home Credit also looks at nitty gritty aspects of applicants' financial backgrounds, including month-by-month payment performance on any loans or credit card balances that the applicant has previously had with Home Credit, as well as the amount and monthly repayment balances of any loans that the applicant may have received from other lenders.
 
 All of these features are spread across seven data tables. The main data table (\colorbox{backcolor}{\textcolor{black}{\texttt{application_\{train \textbar~test\}.csv}}}) contains 120 features that comprise applicants' personal background information. The other six data tables contain applicants' previous loan and credit card balance payment histories. Detailed descriptions of each data table can be found in Appendix \ref{appendix:datatabledescriptions}. Explanations of all features in each data table are in Appendix \ref{appendix:datatablefeatures}. The following diagram provides a brief summary:
 
-\begin{figure}[ht]
+\pagebreak
+
+\begin{figure}[h!]
 \includegraphics[width=0.9\textwidth]{homecredit}
 \centering
 \caption{Home Credit Data Table Relationships\cite{kagglehomecreditcompetitiondata}}
@@ -91,9 +97,9 @@ SK_ID_CURR,TARGET
 etc.
 \end{lstlisting}
 
-To solve this competition I intend to try out several machine learning algorithms that can also return the probabilities of their classification predictions, such as logistical regression and multi-layer perceptron classifiers. For each classifier I build, I will experiment with tuning hyperparameters both manually and automatically. I will train my algorithms using the 307,511 borrower records that comprise the training segment. However, since this is a Kaggle competition, Home Credit has removed the target data from the test set. This means that in order to guage the performance of the different algorithms I attempt to use, and in order to ensure that I don't overfit to the training data, it is imperative that I set aside a fraction of the training set (around 20\%) to serve as a validation test set. Alternatively, I could employ an algorithm such as K-Fold Cross Validation.
+To solve this competition I intend to try out several machine learning algorithms that can also return the probabilities of their classification predictions, such as logistical regression and multi-layer perceptron classifiers. I will experiment with tuning hyperparameters both manually and automatically. I will train my algorithms using the 307,511 borrower records that comprise the training segment. However, since this is a Kaggle competition, Home Credit has removed the target data from the test set. This means that in order to guage the performance of the different algorithms I attempt to use, and in order to ensure that I don't overfit to the training data, it is imperative that I set aside a fraction of the training set (around 20\%) to serve as a validation test set. Alternatively, I could employ an algorithm such as K-Fold Cross Validation.
 
-The seven data tables provided by Home Credit contain an awful lot of information that could take months to thoroughly investigate. So for the purposes of this project, I will focus on the features in the main data table. However, I will engineer at least one feature that is based on some portion of the data contained inside the other six tables. Finally, I will experiment with both manual and automatic feature selection.
+The seven data tables provided by Home Credit contain an awful lot of information that could take months to thoroughly investigate. So for the purposes of this project, I will focus on the features in the main data table. However, I will engineer at least one feature that is based on some portion of the data contained inside at least one of the other six tables. Finally, I will experiment with both manual and automatic feature selection.
 
 Once I've finished my experimentation, I will choose the classifier/hyperparameter/feature combination that scores highest on my validation set and submit its test set probability predictions on the Kaggle competition's page. I am looking forward to seeing how my submission performs relative to other entries on the competition's leaderboard.
 
@@ -113,11 +119,13 @@ Because the goal of this competition is to create an algorithm that correctly id
 \section{Analysis}
 \subsection{Data Exploration}
 \subsubsection{Data Table Statistics and Samples}
-For this project I will make use of both the main data table (\colorbox{backcolor}{\textcolor{black}{\texttt{application_\{train \textbar~test\}.csv}}}) and the bureau data table (\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}). The main data table's training segment (\colorbox{backcolor}{\textcolor{black}{\texttt{application_train.csv}}}) contains 307,511 rows, each representing a unique individual who has previously borrowed money from Home Credit. The main data table contains 122 columns. The first two columns, \colorbox{backcolor}{\textcolor{black}{\texttt{SKI_ID_CURR}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{TARGET}}}, represent a borrower's loan ID and target value, respectively. The loan ID is a unique identifier assigned to each borrower. A target value of 1 indicates that the borrower eventually made at least one late loan payment. A target value of 0 indicates that the borrower always paid on time. The remaining 120 columns contain features that encapsulate various information from a borrower's loan application profile. Features are both categorical and numerical. Some categorical features, such as gender (\colorbox{backcolor}{\textcolor{black}{\texttt{CODE_GENDER}}}), have not yet been one-hot encoded. Other categorical features, like whether or not the applicant submitted a mobile phone number (\colorbox{backcolor}{\textcolor{black}{\texttt{FLAG_MOBIL}}}), have been one-hot encoded. Some numerical features have been normalized and others have not. Most of the normalized features, such as the average number of entrances (\colorbox{backcolor}{\textcolor{black}{\texttt{ENTRANCES_AVG}}}), represent data about the applicant's building of residence. Non-normalized features often encapsulate general data on an applicant's employment and financial background, such as the number of days the applicant has had a job (\colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}). Summary statistics of each numerical and previously one-hot encoded categorical feature in the main data table's training set can be viewed in Appendix \ref{appendix:maindatatablestatsummary}. Samples of the first five entries for each of the features can be seen in Appendix \ref{appendix:maindatatablesamples}. Of the 307,511 applicants in the training segment, 282,686 people have a target value of 0 and 24,825 have a target value of 1. This means that roughly 8\% borrowers in the training set have made at least one late loan payment.
+For this project I will make use of both the main data table (\colorbox{backcolor}{\textcolor{black}{\texttt{application_\{train \textbar~test\}.csv}}}) and the bureau data table (\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}). The main data table's training segment (\colorbox{backcolor}{\textcolor{black}{\texttt{application_train.csv}}}) contains 307,511 rows, each representing a unique individual who has previously borrowed money from Home Credit. The main data table contains 122 columns. The first two columns, \colorbox{backcolor}{\textcolor{black}{\texttt{SKI_ID_CURR}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{TARGET}}}, represent a borrower's loan ID and target value, respectively. The loan ID is a unique identifier assigned to each borrower. A target value of 1 indicates that the borrower eventually made at least one late loan payment. A target value of 0 indicates that the borrower always paid on time. The remaining 120 columns contain features that encapsulate various information from a borrower's loan application profile. Features are both categorical and numerical. Some categorical features, such as gender (\colorbox{backcolor}{\textcolor{black}{\texttt{CODE_GENDER}}}), have not yet been one-hot encoded. Other categorical features, like whether or not the applicant submitted a mobile phone number (\colorbox{backcolor}{\textcolor{black}{\texttt{FLAG_MOBIL}}}), have been one-hot encoded. Some numerical features have been normalized and others have not. Most of the normalized features, such as the average number of entrances in a building, (\colorbox{backcolor}{\textcolor{black}{\texttt{ENTRANCES_AVG}}}), represent data about the applicant's building of residence. Non-normalized features often encapsulate general data on an applicant's employment and financial background, such as the number of days the applicant has had a job (\colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}). A complete list of the main data table features in each of these categories can be seen in Appendix \ref{appendix:maindatatablefeaturetypes}.
 
-The main data table's testing segment (\colorbox{backcolor}{\textcolor{black}{\texttt{application_test.csv}}}) is identical in structure to \colorbox{backcolor}{\textcolor{black}{\texttt{application_train.csv}}}, save for the fact that the target information for the 48,744 borrowers in this segment has been removed. I will use my final, validated learning algorithm to predict target values for the borrowers contained in this data table, and then submit these predictions on Kaggle.
+Summary statistics of each numerical and previously one-hot encoded, now binary, categorical feature in the main data table's training set can be viewed in Appendix \ref{appendix:maindatatablestatsummary}. Samples of the first five entries for each of the features can be seen in Appendix \ref{appendix:maindatatablesamples}. Of the 307,511 applicants in the training segment, 282,686 people have a target value of 0 and 24,825 have a target value of 1. This means that roughly 8\% borrowers in the training set have made at least one late loan payment.
 
-The bureau data table (\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}) contains summary information of applicants' loans from other lenders, such as the amount and type of loan, as well as overdue repayment balance. Each row represents a unique loan. Many individual applicants have several rows in the bureau data table, where each row represents a different loan belonging to the same applicant. I will later engineer a feature based on the features contained in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}. Appendix \ref{appendix:bureaudatatablestatsummary} contains statistical summaries of the numerical features in the bureau data table. Appendix \ref{appendix:bureaudatatablesamples} contains samples of the first five entries of all features.
+The main data table's testing segment (\colorbox{backcolor}{\textcolor{black}{\texttt{application_test.csv}}}) is identical in structure to \colorbox{backcolor}{\textcolor{black}{\texttt{application_train.csv}}}, save for the fact that the target information for the 48,744 borrowers in this segment has been removed. I will use my final, test validated learning algorithm to predict target values for the borrowers contained in this data table, and then submit these predictions on Kaggle.
+
+The bureau data table (\colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}) contains summary information of applicants' loans from other lenders, such as the amount and type of loan, as well as overdue repayment balance. Each row represents a unique loan. Many individual applicants have several rows in the bureau data table, where each row represents a different loan belonging to the same applicant. I will later engineer a feature based on one or more of the features contained in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}}. Appendix \ref{appendix:bureaudatatablestatsummary} contains statistical summaries of the numerical features in the bureau data table. Appendix \ref{appendix:bureaudatatablesamples} contains samples of the first five entries of all features.
 
 \subsubsection{Main Data Table Features with `NaN' Entries}
 The defining characteristic of the main data table is the prevalence of `NaN' entries. Over 67 of the 120 total features have one or more entries of `NaN'. Several of these features, especially ones containing numerical information on a borrower's residence building such as \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}} and
@@ -133,16 +141,16 @@ The defining characteristic of the main data table is the prevalence of `NaN' en
 I confirmed that for all 67 features, a borrower simply having an `NaN' entry for a feature will not help predict whether the borrower will be more or less likely to be delinquent. I verified this by looking at the fractions of each feature's `NaN' and non-`NaN' cohorts that had a target value of 1. For each feature, I found that the fraction of `NaN' borrowers who were delinquent payers was identical to the fraction of non-`NaN' borrowers who were delinquent. If just having `NaN' for a particular feature were to have any chance of being a meaningful predictor of delinquency, I would have expected these two proportions to have had a stastically significant difference. Statistics summarizing `NaN' values for each feature can be viewed in Appendix \ref{appendix:maindatatablenanstatsummary}.
 
 \paragraph{Question 2:}
-It's helpful to remember that there are 24,825 borrowers in the training dataset who had a target value of 1. Any feature that I retain in spite of its `NaN' entries needs to have a large enough amount of non-'NaN' entries that belong to delinquent repayers. If the training set's delinquent population is not adequately represented among a particular feature's valid data points, it's unlikely that a prediction algorithm trained on this feature would generalize well to unseen datapoints. The effective size of the feature's training set would be too small, and the model would be at risk of underfitting.
+It's helpful to remember that there are 24,825 borrowers in the training dataset who had a target value of 1. Any feature that I retain in spite of its `NaN' entries needs to have a large enough amount of non-`NaN' entries that belong to delinquent repayers. If the training set's delinquent population is not adequately represented among a particular feature's valid data points, it's unlikely that a prediction algorithm trained on this feature would generalize well to unseen datapoints. The effective size of the feature's training set would be too small, and the model would be at risk of underfitting.
 
-However, what should the cutoff line be? What fraction of the 24,825 delinquent borrowers need to be represented by a feature's valid data points in order for the feature to be useful for making predictions? There is no general rule of thumb, but the short answer is that it depends -- on many factors such as the distribution of the feature's valid data, as well as the type of learning algorithm I'm using.
+However, what should the cutoff line be? What fraction of the 24,825 delinquent borrowers need to be represented by a feature's valid data points in order for the feature to be useful for making predictions? There is no general rule of thumb and the short answer is that it depends -- on many factors such as the distribution of the feature's valid data, as well as the type of learning algorithm I'm using.
 
 Thus for the time being I decided not to remove any of these features -- even features like \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}} that contain `NaN' in over two-thirds of their entries. Instead of running detailed statistical analyses on these features' distributions, I will instead experiment with dimensionality reduction algorithms such as PCA and/or feature selection algorithms such as SelectKBest.
 
 If a feature had 95\% of its entries as `NaN', I would have removed it from the dataset at this point. However, since the sparsest features in the main data table still have valid data in just over 30\% of their entries, I don't want to prematurely remove a feature that may have a chance, however remote, of contributing to useful predictions.
 
 \paragraph{Question 3:}
-I found that all but one of the 46 normalized numerical features contain `NaN' values. About half of the 21 non-normalized numerical features contain `NaN' entries. Only three out of the 15 categorical features that will need to be one-hot encoded contain `NaN' entries. None of the already one-hot encoded categorical features contain `NaN' entries. See Appendix \ref{appendix:maindatatablefeaturetypes}.
+I found that all but one of the 47 normalized numerical features contain `NaN' values. About half of the 21 non-normalized numerical features contain `NaN' entries. Only three out of the 15 categorical features that will need to be one-hot encoded contain `NaN' entries. None of the already one-hot encoded categorical features contain `NaN' entries. See Appendix \ref{appendix:maindatatablefeaturetypes}.
 
 \subsubsection{Main Data Table Borrowers with `NaN' Entries}
 I investigated whether any borrowers had `NaN' entries for nearly all of their feature data -- could any borrowers be removed from the training set because their feature data is too sparse?
@@ -153,7 +161,7 @@ I investigated whether any borrowers had `NaN' entries for nearly all of their f
 \caption{Borrowers Missing Main Data Table Features}
 \end{figure}
 
-The above plot confirms that no borrowers are missing data for so many features such that they'd be considered outliers. At it is, a borrower could at most be missing roughly only half of the main data table's 120 features. Just under 20,000 of the training dataset's 307,511 borrower records face this "worst-case" scenario. A borrower would have to be missing over 100 features, or at least five-sixths of the main data table featureset, before I would removing them.
+The above plot confirms that no borrowers are missing data for so many features such that they'd be considered outliers. At it is, a borrower could at most be missing roughly only half of the main data table's 120 features. Just under 20,000 of the training dataset's 307,511 borrower records face this "worst-case" scenario. A borrower would have to be missing well over 100 features, or at least five-sixths of the main data table featureset, before I would consider removing them. Becauase these 20,000 borrowers have valid entries for half of the dataset's features, I believe there is a greater chance that they will be valuable training points for my learning algorithm, as opposed to being unhelpful noise.
 
 \subsubsection{Main Data Table Anomalies}
 I explored data samples\ref{appendix:maindatatablesamples} and statistical descriptions\ref{appendix:maindatatablestatsummary} of the main data table to ensure that no features contained unexpected values that fall outside the range one would expect based on the feature's definition. Examples of unexpected values include entries that are impossibly small/large, or values that are negative when only positive values would be expected.I came across the following five anomalies.
@@ -176,7 +184,11 @@ I noticed that other categorical features in the main data table, such as whethe
 
 Things are different for the \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} features. Although the most children any loan applicant had was 19, at least 75\% of all applicants had either zero children or just one child. I decided that it makes most sense to treat  \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} as a categorical feature, and re-engineer it to segment the borrower population into the following two categories: having no children, and having one or more children. Although I expect there will groups of borrowers of diminishing size that have 2,3,4,...,19 children, my hypothesis is that having no children versus having at least one child will be the information most useful to predict target values for the overall population of borrowers. Even if I were to spend time investigating the effects of having 2 vs. 3 vs. 4 vs. ... vs. 19 children, I know that my findings would apply to less than 25\% of the overall population and any predictions informed by these effects likely wouldn't generalize well to unseen datapoints.
 
+I will transform the \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} feature into a binary categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CHILDREN}}}. If the value of \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} is greater than 0, the value of \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CHILDREN}}} will be 1. If the value of \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} is 0, the value of \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CHILDREN}}} will be 0.
+
 For \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}}, the situation is somewhat similar. 25\% of borrowers in the training set have a family size of just one, 50\% have a family of two or less, and 75\% of borrowers have families of 3 people or less. I plan to re-engineer this feature to categorically segment borrowers into the following three groups: having a family size of one, a family size of two, and having a family that's three people or larger.
+
+I will transform the \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} feature into a categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}}. If \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} is 1.0, then the value of \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}} will be `one'. If \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} is 2.0, then \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}} will be `two'. If \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} is 3.0 or greater, then \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}} will be `three_plus'. The new categorical feature \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}} will eventually be one-hot encoded.
 
 \paragraph{Anomaly 3:}
 While most features reported as being normalized have a max value of 1.0 and a min value of 0.0. The features \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}} all have values within the range (0.0, 1.0), none of them have maximums of 1.0, nor minimums of 0.0. Because of this discrepancy I will pay special attention to the graphs of these features' distributions when conducting my exploratory data visualization.
@@ -185,7 +197,7 @@ While most features reported as being normalized have a max value of 1.0 and a m
 The feature \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}} is unique in that while it is identified as normalized, its values only fall into the range [0.000290, 0.072508]. All other normalized features were scaled to the range [0.0,1.0]. It's a given that I'll need to scale this feature to [0.0,1.0] during data preprocessing.
 
 \paragraph{Anomaly 5:}
-The five features \colorbox{backcolor}{\textcolor{black}{\texttt{FONDKAPREMONT_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{HOUSETYPE_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{TOTALAREA_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{WALLSMATERIAL_MODE}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{EMERGENCYSTATE_MODE}}} were described by Home Credit as normalized. However, I found that each of these five features was in fact categorical, and would need to be one-hot encoded. \colorbox{backcolor}{\textcolor{black}{\texttt{WALLSMATERIAL_MODE}}}, for example, contains entries such as ``Stone, brick", ``panel", and ``block" that indicate the material(s) of which the walls in the borrower's house are built.
+The four features \colorbox{backcolor}{\textcolor{black}{\texttt{FONDKAPREMONT_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{HOUSETYPE_MODE}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{WALLSMATERIAL_MODE}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{EMERGENCYSTATE_MODE}}} were described by Home Credit as normalized. However, I found that each of these four features was in fact categorical, and would need to be one-hot encoded. \colorbox{backcolor}{\textcolor{black}{\texttt{WALLSMATERIAL_MODE}}}, for example, contains entries such as ``Stone, brick", ``panel", and ``block" that indicate the material(s) of which the walls in the borrower's house are built.
 
 \subsubsection{Feature Engineering}
 Of the six tables in the dataset aside from the main data table, four tables (\colorbox{backcolor}{\textcolor{black}{\texttt{previous_application.csv}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{POS_CASH_balance.csv}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{installments_payments.csv}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{credit_card_balance.csv}}}) contain information pertaining to previous applications and payback histories on prior loans that an applicant has had with Home Credit.
@@ -200,7 +212,7 @@ My engineered feature will be titled \colorbox{backcolor}{\textcolor{black}{\tex
 
 \subsection{Exploratory Visualization}
 \subsubsection{Distributions of Main Data Table Numerical Features Identified as Normalized}
-I plotted distributions of 46 numerical features that Home Credit had identified as normalized. I ignored all `NaN' entries. All 46 plots can be viewed in Appendix \ref{normalfeaturedistibs}. I paid special attention to the distributions of four features I had found anomalous while exploring the dataset: \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}}.
+I plotted distributions of 47 numerical features that Home Credit had identified as normalized. I ignored all `NaN' entries. All 47 plots can be viewed in Appendix \ref{normalfeaturedistribs}. I paid special attention to the distributions of four features I had found anomalous while exploring the dataset: \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_1}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_2}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{EXT_SOURCE_3}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}}.
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{distribsEXTSOURCE1EXTSOURCE2EXTSOURCE3}
@@ -232,17 +244,27 @@ Normalized features describing general qualities of a borrower's residence that 
 \caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{ELEVATORS_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{NONLIVINGAPARTMENTS_MEDI}}}}
 \end{figure}
 
-On the other hand, the remaining normalized features, such as \colorbox{backcolor}{\textcolor{black}{\texttt{ELEVATORS_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{NONLIVINGAPARTMENTS_MEDI}}}, describe more niche characteristics of a residence building that may not apply to many borrowers in the training set. For example, individuals who live in a house wouldn't be expected to have any elevators, a public common area, or non-living apartments in their residence. Even though these features have been normalized, they tend to be noticeably positively skewed.
+On the other hand, the remaining normalized features, such as \colorbox{backcolor}{\textcolor{black}{\texttt{ELEVATORS_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{COMMONAREA_MEDI}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{NONLIVINGAPARTMENTS_MEDI}}}, describe more niche characteristics of a residence building that may not apply to many borrowers in the training set. For example, individuals who live in a house wouldn't be expected to have any elevators, a public common area, or non-living apartments in their residence. Even though these features have been normalized, they tend to be noticeably positively skewed. Nonetheless, because these features are identified as having already been ``normalized," I will not attempt to further log-normalize these features -- due to the nature of these features' values, their distributions are likely already as ``normal" as they can possibly get.
 
 \subsubsection{Distributions of Main Data Table Numerical Features Identified as Non-Normalized}
-I also plotted histograms of 21 numerical features that were not identified by Home Credit as being normalized, in order to observe their skewness and discover which ones would be candidates for log-normalization. All 21 plots can be viewed in Appendix \ref{nonnormalfeaturedistibs}. All of these 21 features will need to be scaled to a range of [0.0,1.0]. All but three features are good candidates for log-normalization -- especially features having most values concentrated near zero and a smattering of large-valued outliers. Log-normalization may prevent the wide gulfs between these features' very large and small values from hindering a learning algorithm's performance.
+I also plotted histograms of 21 numerical features that were not identified by Home Credit as being normalized, in order to observe their skewness and discover which ones would be candidates for log-normalization. All 21 plots can be viewed in Appendix \ref{nonnormalfeaturedistribs}. All of these 21 features will need to be scaled to a range of [0.0,1.0]. All but three features are good candidates for log-normalization -- especially features having most values concentrated near zero and a smattering of large-valued outliers. Log-normalization may prevent the wide gulfs between these features' very large and small values from hindering a learning algorithm's performance.
 
 Interestingly, the features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_BIRTH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_ID_PUBLISH}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}} already have non-skewed, normal shaped distributions. It will not be necessary for them to be log-normalized.
 
-\begin{figure}[ht]
+\pagebreak
+
+\begin{figure}[h!]
 \includegraphics[width=\textwidth]{distribsDAYSBIRTHDAYSIDPUBLISHHOURAPPRPROCESSSTART}
 \centering
 \caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_BIRTH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_ID_PUBLISH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}}}
+\end{figure}
+
+There are three non-normalized features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_REGISTRATION}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_LAST_PHONE_CHANGE}}} that have both skewed distributions, as well as values that fall inside a range of negative numbers. Because features with negative values cannot be log-transformed, these features' distributions would first need to be translated positively to the right, such that all their values are greater than or equal to zero.
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{distribsDAYSEMPLOYEDDAYSREGISTRATIONDAYSLASTPHONECHANGE}
+\centering
+\caption{Distributions of Features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_REGISTRATION}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_LAST_PHONE_CHANGE}}}}
 \end{figure}
 
 Finally, the two features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} contain an alarmingly large amount of high-valued outliers that will need to be addressed. I explore each of these features in depth below.
@@ -255,8 +277,6 @@ I observed that the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED
 \centering
 \caption{Distribution of Feature \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}}
 \end{figure}
-
-\pagebreak
 
 I ranked each value of \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} in descending order of frequency and confirmed that all these outlier entries had the same value of 365,243.
 
@@ -280,18 +300,7 @@ This meaning is obviously absurd and there has to be another reason that so many
 
 Intuitively, I can see that all things being equal, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} may well be a good predictor of target values. After all, if someone doesn't have a job or only just recently got a job, it stands to reason that there is a greater chance they won't have enough money to make loan payments on time. Unfortunately, I am not confident that the feature, as currently structured, will be able to adequately convey this information to a learning algorithm.
 
-I therefore propose two separate but complementary strategies to work around \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}'s shortcomings:
-
-\begin{enumerate}
- \item Create a new categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. All individuals who have a value of 365243 for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} will be assigned a value of 0 for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. All individuals who have a value of 0 or less for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} will be assigned a value of 1 for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}.
- \item Replace all the entries in \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} containing the value 365243 with `NaN'. If I were to do this, the feature's new distribution appears to be more normal and may be more promising for use with a learning algorithm.
-\end{enumerate}
-
-\begin{figure}[ht]
-\includegraphics[width=0.7\textwidth]{distribDAYSEMPLOYEDMODIFIED}
-\centering
-\caption{Distribution of Feature \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} with the Anomalous 55,374 ``365243" Entries Removed}
-\end{figure}
+I therefore propose to replace the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} feature with a new categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. All individuals who have a value of 365243 for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} will be assigned a value of 0 for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. All individuals who have a value of 0 or less for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} will be assigned a value of 1 for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}.
 
 \subsubsection{Deeper Dive into the \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} Feature}
 There appear to be just under 4,000 borrowers who have a value for \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} that's between 60.0 and 70.0. This is far too many people than would be expected based on this feature's distribution.
@@ -329,26 +338,533 @@ The distribution's pattern indicates that I should expect only one or two borrow
 The good news is that I probably won't have to worry about this. Since 3,334 borrowers is only just over 3\% of the \colorbox{backcolor}{\textcolor{black}{\texttt{OWN_CAR_AGE}}} feature's 104,582 valid non-`NaN' entries, log-normalizing this feature should be enough to counteract any negative effects that the anomalous spike may have on a learning algorithm.
 
 \subsection{Algorithms and Techniques}
+Below I detail and justify the various algorithms and techniques that I implement at each of the three stages of my problem solving process.
 
+\subsubsection{Data Preprocessing}
+\begin{enumerate}
+  \item \textbf{Create a cross-validation set that's 20\% of the size of the training data set}. Having a validation test set is necessary for model selection and for ensuring that trained learning algorithms are robust to overfitting and will generalize well to unseen data. In Kaggle competitions, it can be tempting to use the public leaderboard results during the competition to guage a model's performance. This is a huge mistake. Public leaderboard results are typically based on models' predictions on \textit{only} 20\% of the testing data table, or just 9,479 of the testing set's 48,744 rows or borrowers. There is no guarantee that these 9,479 rows are an adequate representation of the entire testing set, and thus there is no guarantee that a high score on the public leaderboard will translate to a high score at the end of the competition when final scores are based on the entire testing set.
+
+  Using 20\% of the training data table, or 61,503 rows, as a test validation set enables me to gauge my models' performance in a way that is likely far more predictive of how they will perform on the entire testing set of 48,744 rows. One downside is that when comparing my various models against each other to see which is best, I can only train each model on 246,008 rows, as opposed to the full training set of 307,511 rows. A common workaround to this is to use an algorithm like K-Fold cross-validation, which allows models to be trained on every point in the training set before being compared to each other.
+
+  However, due to the relatively large size of this training set, as well as due to the fact that I did not want to spend the extra time/money necessary to repeatedly run the more computationally expensive K-Fold cross validation algorithm, I decided that creating a simple train-test cross-validation split of the training dataset would suffice for this project.
+  \item \textbf{Translate negative-valued features to positive ranges}. The two non-normalized features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_REGISTRATION}}} and \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_LAST_PHONE_CHANGE}}} have significantly skewed distributions which will need to be log-normalized. However, since the log-normalization algorithm can only transform data that's distrbuted over positive ranges, each of these features' completely negative value ranges will be translated to the right such that the previously most-negative value of each distribution will become 0, and the new maximum value will be 0 plus the absolute value of that previously most-negative value.
+  \item \textbf{Log-transform numerical features with skewed distributions}. Log-normalization may prevent the wide gulfs between these skewed features' very large and very small values from hindering a learning algorithm's performance.
+  \item \textbf{Impute missing `NaN' values of all numerical features with each feature's mean}. Learning algorithms typically can't handle features that have missing entries. And since virtually all this dataset's numerical features contain one or more `NaN' entries, the only way to still use these features is to replace their missing values with a number. An imputer algorithm calculates a statistical measure, such as mean, of the valid numerical entries of a feature and then replaces each missing entry with that measure. There is always the risk that if too much of a feature's distribution is comprised of imputed numbers, that the feature may not be useful to learning algorithms. Nonetheless, since nearly all this dataset's numerical features have missing values, I believe I have no other choice but to impute the missing values and first make the attempt to use these features. I can always reduce or remove any unhelpful features during this project's refinement phase.
+  \item \textbf{One-hot encode all categorical non-binary features}. At the end of the day, learning algorithms can only learn from features whose values are integer or float numbers. Unfortunately, many datasets have features such as gender or job type whose entries merely indicate categories like ``male" or ``accountant." The most direct way to transform this categorical data into numbers is to transform each one of these multi-categorical features into several individual binary features. For example, a categorical gender feature usually becomes two or more individual binary categorical features: gender-is-male, gender-is-female, etc. All individuals who had a category of ``male" for the original gender feature would now have an integer value of 1 for the new gender-is-male feature. All other individuals would have an integer value of 0 for this feature. The dataset's full featureset will ultimately contain 184 binary categorical features after one-hot encoding is complete.
+  \item \textbf{Replace missing `NaN' values of one-hot encoded features with 0}. The case for doing this is even stronger than the case for imputing numerical features' missing entries with their means. If an individual has `NaN' for a binary categorical feature, it is reasonable to assume that that individual simply didn't belong to the category. Although this obviously can't be proven, it is the only possible logical inference that can be made in these cases. The alternative would be to throw out the entire feature, which I am not willing to do -- I believe that the knowledge of which individuals \textit{actually} had a value of 1 for a binary categorical feature, however sparse these folks may be, is valuable enough to justify making the assumption that all other folks with missing values didn't belong to the category to begin with.
+  \item \textbf{Scale each numerical feature to the range [0,1]}. Most learning algorithms are designed with the assumption that all features vary on similar scales. Although tree-based estimators are robust to this assumption, any other estimators I might use, such as gradient-based estimators, would likely require this prerequisite. Furthermore, since the majority of the dataset's numerical features were already in the scale [0,1], I decided that for consistency's sake I would use a min-max scaling algorithm to scale the remaining numerical features to this range as well.
+\end{enumerate}
+
+\subsubsection{Implementation}
+\begin{enumerate}
+  \item \textbf{Gaussian Naive Bayes classifier}. I felt that a Naive Bayes classifier would be a greate algorithm to serve as a baseline benchmark right out of the box. It's quick to run, requires no hyperparameter tuning, and is robust to large featurespaces. It's also designed to be good at binary classification, which is goal of this project. Finally, Naive Bayes is able to output posterior probabilities of each of its Target predictions, which is something that any learning algorithm I use in this project must be able to do -- these actual proabilities are what will be submitted to Kaggle inside a CSV file.
+  \item \textbf{AdaBoost classifier using a Decision Tree classifier as a base estimator}. AdaBoost is an adaptive learning algorithm, which means that it first fits a classifier (a Decision Tree classifier in this case) to the dataset, and then repeatedly fits additional copies of the same classifier on the dataset. However, on each iteration Adaboost adjusts the estimator's weights such that the next classifier focuses more on correctly classifying instances that were incorrectly classified by classifiers on prior iterations. This process of iteratively training classifiers, making predictions, and then adapting estimator weights is why AdaBoost is called a ``boosting" algorithm. Over several iterations, AdaBoost pays less attention to features that don't improve the model's predictive power, and focuses only on those features that do increase predictive power. It is largely because of this that I chose to use AdaBoost. I was concerned that a plain Decision Tree classifier might be at risk of overfitting to all 251 features that are in my data's unreduced featurespace. AdaBoost will allow me to observe how well a Decision Tree algorithm makes predictions, while guarding against the overfitting that might otherwise be a risk due to the large featurespace of my dataset.
+  \item \textbf{GridSearchCV}. GridSearchCV is useful for automatially tuning hyperparameters. Although it can be more straightforward, and less computationally expensive, to manually tune a classifier's hyperparameters one parameter at a time, this can sometimes lead to an algorithm getting stuck at a local performance maxima. Indeed, there are situations where one particular \textit{combination} of hyperparameter values may be superior to a different \textit{combination}, but the chances of discovering the superior combination by adjusting one parameter at a time could be very remote. GridSearchCV generates a grid of hyperparameter combinations after the user specifies ranges of discrete values for each hyperparameter that they wish to tune. GridSearchCV then methodically trains a given classifier using each unique combination of hyperparameter values, and uses K-Fold cross validation and a scoring function specified by the user to compare the hyperparameter combinations and return the combination belonging to the classifier that scored highest. I will use GridSearchCV with AdaBoost in order to find an ideal tradeoff between AdaBoost's learning_rate and n_estimators parameters.
+
+  Unfortunately GridSearchCV can be computationally expensive to run if there are several hyperparameters that can be tuned. This is all the more true when hyperparameters have large ranges of possible values. Therefore, in the interest of time, and because I intend to run my kernel locally on my laptop, I do not intend to use GridSearchCV with all learning algorithms I attempt to train.
+  \item \textbf{Logistic Regression classifier}. Since logistic regression is often used for binary classification problems, it was one of the first learning algorithms I thought to use to solve this competition's goal of classifying borrowers into the two segments of delinquent repayers (Target = 1) and on-time repayers (Target = 0). Logistic regression generates coefficients for each of a dataset's features, and then constructs a linear equation composed of these features and their coefficients that can generate the best possible predictions of Target values for the majority of the dataset's datapoints (borrowers, in this case). As the logistic regression classifier gets trained on each point in the dataset, the value of each feature's coefficient is continually modified so as to maximize the likelihood of observing the sample values. Specifically, logistical regression adjusts the feature coefficients to maximize the logged odds of observing the sample values, or $ln(\frac{p}{1-p})$, where p is the probability that the user is a delinquent repayer if their observed Target value is 1, or the probability that they are an on-time repayer if their observed Target value is 0.
+
+  A downside of logistic regression is that it assumes all features are independent. I will try my best to ensure that this will be the case for my dataset (ie. when re-engineering an existing feature, I will only keep the new, transformed feature and will discard the original feature that it was based on). However, given the size of the dataset's featurespace (it will have 251 features after one-hot encoding), the uncertain provenance of certain features, as well as my uncertainty about Home Credit's data entry methodology, it is not realistic for me to assume perfect independence among the featurespace's 251 features. Nonetheless, I am optimistic that my data will be robust enough such that logisitic regression will still work adequately at the very least.
+  \item \textbf{Multi-Layer Perceptron classifier}. Multi-layer perceptron classifiers build a neural network comprised of several hidden layers that outputs a set of probability predictions for each point in the dataset. The predictions contain the probabilities that a point, or borrower in our case, belongs to each of the dataset's Target categories. Multi-layer perceptron classifiers can learn non-linear models, and can support a variety of activation functions, such as `relu' or `tanh', for generating probability predictions. I wanted to use a multi-layer perceptron simply to see how its performance compared to that of a linear logistic regression classifier when trained on this dataset. MLPs are sensitive to feature scaling and this is yet another reason I had to ensure that all my numerical features were scaled to the range [0,1].
+  \item \textbf{LightGBM classifier}. For my final classifier, I wanted to use one of the two most widely used learning algorithms as of late, namely XGBOOST or LightGBM (gradient boosting machine). Similar to AdaBoost, XGBOOST and LightGBM are also boosting algorithms that are based on the decision tree algorithm. The difference between LightGBM and XGBOOST (and most other decision tree algorithms) is that LightGBM grows trees leaf-wise, instead of level-wise.
+
+  \begin{figure}[ht]
+  \includegraphics[width=0.7\textwidth]{leaf-wise}
+  \centering
+  \caption{Leaf-wise (Best-first) tree growth (LightGBM)\cite{lightgbmdocs}}
+  \end{figure}
+
+  \begin{figure}[ht]
+  \includegraphics[width=0.7\textwidth]{level-wise}
+  \centering
+  \caption{Level-wise tree growth (XGBOOST and other decision tree algorithms)\cite{lightgbmdocs}}
+  \end{figure}
+
+  Growing trees leaf-wise can reduce more loss than growing trees level-wise, and LightGBM is therefore able to achieve better accuracy than many of the other boosting algorithms \cite{vidhyalightgbm}.
+
+  Like XGBOOST, LightGBM is good with large datasets. However, LightGBM typically trains much faster than XGBOOST and also uses less memory. This final criteria is very important to me as during this project, I intend to create a kernel that can be run on my own laptop locally, without having to rent time on an Amazon EC2 instance.
+
+  The main weak point of LightGBM is that the increased accuracy made possible by its leaf-wise splitting approach also raises the chance that the model will overfit to the training data.
+
+  There are hyperparameters that can be tuned to prevent this, but this unfortunately leads to another downside of LightGBM, which is that it has \textit{a lot} of hyperparameters that can be tuned -- there are likely far more combinations than I can efficiently tune using an automatic algorithm like GridSearchCV locally on my laptop. However, one saving grace is that many of these hyperparameters merely offer different approaches to reaching the same goal, which is to take advantage of LightGBM's comparatively better accuracy without succumbing to overfitting.
+\end{enumerate}
+
+\subsubsection{Refinement}
+\begin{enumerate}
+  \item \textbf{PCA}. I will experiment with using Principle Component Analysis to reduce the dimensionality of my dataset's 67 numerical features. My approach will be to fit a PCA algorithm to the numerical features in the training dataset, and observe which and how many reduced components, or eigenvectors, explain the biggest chunks of roughly 90\% of the 67-dimension numerical featurespace's variance. I will then merge these PCA-reduced features back to the 184 binary features that are in the dataset after one-hot encoding, and re-train the above five learning algorithms on this reduced dataset.
+
+  My hypothesis is that reducing the dimensionality of numerical features may help the performance of my learning algorithms, particularly logistic regression, that expect all training features to be independent. PCA works by finding a lower dimensional subspace on which to project a featurespace's higher dimensional features. The benefit is that redundant information in certain features that is correlated with other features' data is eliminated, all while only slightly raising the likelihood of added error. A reduced numerical featurespace may also benefit algorithms like LightGBM that have great accuracy but can be prone toward overfitting.
+
+  Of course, this approach could backfire if it turns out that there are a small amount of numerical features that in their raw, unreduced form are more useful to my learning algorithms than any of the reduced components produced by PCA.
+  \item \textbf{SelectKBest}. Applying PCA can mitigate against noise and correlation amongst my featureset's 67 numerical features, but what about the 184 categorical features that will exist after one-hot encoding is complete? I want to investigate whether reducing the scope of the entire featureset, not just numerical features, will possibly help sharpen the focus of my learning algorithms, and enable them to make predictions that generalize better to unseen data.
+
+  A common technique for this kind of feature selection is to use the algorithm SelectKBest. SelectKBest computes a score for each feature in a dataset and then modifies the dataset, removing all but the top K scoring features. Several kinds of scoring functions can be used. I will use the f_classif scoring function, which computes the ANOVA F-value between a feature and a label. This type of scoring function is useful for measuring how well a feature contributes to classification tasks, which is precisely what this competition is.
+
+  There is no clear rule of thumb for determining the ideal K number of a dataset's features to keep. I plan to try a few different values of K, and see if I can find a value that results in improved performance in any of the above five learning algorithms when they are trained on those K features.
+\end{enumerate}
 
 \subsection{Benchmark}
-Since Kaggle ranks submissions to this competition by the area under the ROC curve between their predicted proabilities of delinquency and the actual observed targets (whether or not the borrower did make at least one late payment), an ideal benchmark would be the area under ROC curve of the prediction model employed by Home Credit's data scientists prior to this competition's debut on Kaggle.
+Solutions to this competition will be ranked on Kaggle by the area under the ROC curve between their predicted proabilities and the observed targets (whether or not the borrower was actually delinquent).
 
-However, since Home Credit possibly considers the specifics of this model and its ROC curve area to be proprietary information, it is understandable that this score has not been disclosed. As a next best alternative, I will use as a benchmark the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score. The reader may refer to the file \colorbox{backcolor}{\textcolor{black}{\texttt{home-credit-default-risk-publicleaderboard(6-02-2018).csv}}}, located inside this project's Github repository\cite{githubprojectrepo}, to verify my calculation of this benchmark.
+I will train a Gaussian Naive Bayes classifier on a fully preprocessed dataset and use its ROC area under curve score as my primary benchmark. Gaussian Naive Bayes is ideal for this because it needs no hyperparameter input nor tuning. It also trains faster than most other models and I should have no difficulty training it on the dataset's 300,000+ rows locally on my own machine. I am optimistic that with appropriate model selection and hyperparameter tuning I will be able to build a learning algorithm that outperforms this simple out-of-the-box Gaussian Naive Bayes model.
+
+In order to guage how my solution compares to others in the Kaggle community, I will use the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018 as a secondary, personal benchmark. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score. The reader may refer to the file \colorbox{backcolor}{\textcolor{black}{\texttt{home-credit-default-risk-publicleaderboard(6-02-2018).csv}}}, located inside this project's Github repository\cite{githubprojectrepo}, to verify my calculation of this secondary benchmark.
+
+It would also be nice to know the area under ROC curve of the prediction model employed by Home Credit's data scientists prior to this competition's debut on Kaggle. However, since Home Credit possibly considers this model and its ROC curve area to be proprietary information, it is understandable that it was not disclosed.
 
 \section{Methodology}
 \subsection{Data Preprocessing}
+I proceeded through the following 19 steps when preprocessing my dataset.
+
+\begin{enumerate}
+ \item Create 7 lists that categorize the dataset's features into following groups based on how each feature will need to be preprocessed:
+   \begin{enumerate}
+    \item Categorical features needing one-hot encoding
+    \item Binary categorical features
+    \item Non-normalized numerical features with skewed distributions and negative values
+    \item Non-normalized numerical features with skewed distributions and only positive values
+    \item Numerical features with normal distributions, but not scaled to the range [0,1]
+    \item Numerical features with normal distributions and scaled to the range [0,1]
+    \item Features that will be re-engineered and transformed into different features
+  \end{enumerate}
+  Creating these 7 lists keeps my preprocessing organized, and allows me to quickly slice the datatable to access only the features that will need to be adjusted during a particular preprocessing step.
+  \item Separate the Targets column out from training dataset.
+  \item Use train_test_split from sklearn.cross_validation to create a test validation set that is 20\% of the size of the total training set.
+  \item Use the numerical \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} feature to engineer a binary categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CHILDREN}}}. The value of \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CHILDREN}}} will be 1 if the borrower has one or more children, otherwise the value will be 0.
+  \item Drop the \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_CHILDREN}}} feature from the main dataframe. This is done to keep the features as independent as possible.
+  \item Use the \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} feature to engineer a categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{FAMILY_SIZE}}}. \colorbox{backcolor}{\textcolor{black}{\texttt{FAMILY_SIZE}}} will be a multi-categorical feature that will be one-hot encoded along with the other 18 non-binary categorical features that were originally included in the dataset. \colorbox{backcolor}{\textcolor{black}{\texttt{FAMILY_SIZE}}} will have the values of ``one," ``two," or ``three_plus" depending on the numerical value of \colorbox{backcolor}{\textcolor{black}{\texttt{FAMILY_SIZE}}}.
+  \item Drop \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} from the main dataframe.
+  \item Use the \colorbox{backcolor}{\textcolor{black}{\texttt{CREDIT_DAY_OVERDUE}}} feature in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}} to engineer the binary categorical \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CREDIT_BUREAU_LOANS_OVERDUE}}} feature. The value for \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CREDIT_BUREAU_LOANS_OVERDUE}}} will be 1 if the borrower has at least one loan in \colorbox{backcolor}{\textcolor{black}{\texttt{bureau.csv}}} that has a value for \colorbox{backcolor}{\textcolor{black}{\texttt{CREDIT_DAY_OVERDUE}}} that's greater than zero, and 0 otherwise.
+  \item Use the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} feature to engineer a binary categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}. If a borrower has a negative value or zero for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}, then \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}} will be 1, otherwise \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}} will be 0.
+  \item Drop the \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} feature from the main dataframe.
+  \item Translate to positive ranges all values of the 2 remaining non-normalized numerical features that have skewed distributions and negative values: \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_REGISTRATION}}}, and \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_LAST_PHONE_CHANGE}}}.
+  \item Log-transform all 17 non-normalized numerical features that have skewed distributions. These 17 features include the 2 that were translated to positive ranges in Step 11.
+  \item Replace `NaN' values for all numerical features with each feature's mean using Sklearn's Imputer class.
+  \item Remove the borrower ID column, \colorbox{backcolor}{\textcolor{black}{\texttt{SK_ID_CURR}}}, from the main dataframe.
+  \item One-hot encode all 19 now non-binary categorical features.
+  \item Replace all `NaN' values in all binary categorical features with 0.
+  \item Fit a min-max scaler to each of the 17 log-transformed numerical features, as well as to the features \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_BIRTH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_ID_PUBLISH}}}, \colorbox{backcolor}{\textcolor{black}{\texttt{HOUR_APPR_PROCESS_START}}}, and the normalized feature \colorbox{backcolor}{\textcolor{black}{\texttt{REGION_POPULATION_RELATIVE}}}. Each feature will be scaled to a range [0.0, 1.0].
+  \item Build a data preprocessing pipeline to used to preprocess both the test validation and actual testing sets. This pipeline will:
+  \begin{enumerate}
+    \item Recreate all features that were engineered in the training set during the original data preprocessing phase.
+    \item Impute missing numerical values with each column's mean.
+    \item Replace missing `NaN' values of binary categorical features with 0. \item Apply the min-max scaling transforms originally fit on features in the training set to all data points in a testing set.
+    \item Finally, any columns representing binary one-hot encoded features that are in the training set but absent from a test set will be added to the test set and filled with all 0s. Similarly, any columns in a test dataframe that represent one-hot encoded features that aren't present in the training set will be removed from the test dataframe. We always change the test set's columns to ensure they are consistent with those of the training set, not the other way around. This ensures that the final model is as robust as possible to unseen data.
+
+    This kind of adjustment will be necessary when making predictions on the testing datatable in \colorbox{backcolor}{\textcolor{black}{\texttt{application_test.csv}}}, which after one-hot encoding will have one column not in the training set, and will be missing two columns that are in the training set.
+
+    This sort of phenomenon sometimes arises after one-hot encoding. When a multi-categorical feature has some rows in one datatable that have a certain category value, while the corresponding feature in another data table has no rows that have that category value, the two datatables will not have identical sets of binary features after one-hot encoding.
+  \end{enumerate}
+  \item Use the preprocessing pipeline built in Step 18 to preprocess the test validation set.
+\end{enumerate}
+
 \subsection{Implementation}
+I followed the steps below when implementing my learning algorithms, training them on the fully processed featureset of 251 features, and scoring their predictions on the test validation set.
+
+\begin{enumerate}
+  \item Create an ROC area-under-curve scorer method that uses Sklearn's roc_auc_score() method. This scoring function was used to compute the ROC AUC scores of each classifier's predictions on the validation set. It will also be wrapped in Sklearn's make_scorer() method to create a scoring object that can be used by GridSearchCV objects.
+  \item Train a Gaussian Naive Bayes classifier on the training set and use it to make predictions on the test validation set. Calculate the area under ROC curve score of these predictions. No hyperparameters will be needed for this classifier.
+  \item Use GridSearchCV to explore the tradeoff between values for the 'learning_rate' and 'n_estimators' hyperparameters for an AdaBoost classifier that uses a Decision Tree classifier as its base estimator, scoring each combination by ROC AUC score:
+  \begin{lstlisting}
+params = {
+      'learning_rate': [0.01, 0.1, 1.0],
+      'n_estimators': [200, 250, 500,1000],
+      'random_state': [42]
+  }
+  \end{lstlisting}
+  I discovered that the highest scoring AdaBoost classifier had learning_rate=1.0 and n_estimators=1000.
+  \item I then made predictions on the validation set using this AdaBoost classifier and noted ther ROC AUC score.
+  \item Train a Logistic Regression classifier, make predictions on the validation set, and compute the ROC AUC score.
+  \item Train a Multi-Layer Perceptron classifier, make predictions on the validation set, and compute the ROC AUC score.
+  \item Train a LightGBM classifier, make predictions on the validation set, and compute the ROC AUC score. Implenting LightGBM entails some unique steps not necessary when implementing the more run-of-the-mill classifiers included in Sklearn:
+    \begin{enumerate}
+      \item THe LightGBM package must be installed inside my Anaconda environment.
+      \item The training data must be converted to the LightGBM dataset format before the classifier can be trained:
+      \begin{lstlisting}
+lightgbm_training =
+lgb.Dataset(X_train_final, label=y_train)
+      \end{lstlisting}
+      \item Conveniently, LightGBM's predict() method outputs a list of probability predictions that can be directly entered into the roc_auc() method to compute the ROC AUC score. Other classifers output an array containing two columns, from which the second column must be sliced before being used to compute the ROC_AUC score, as is the case for the Multi-Layer Perceptron classifier's predictions:
+      \begin{lstlisting}
+mlp_y_score =
+clf_mlp.predict_proba(X_test_final)[:, 1]
+      \end{lstlisting}
+    \end{enumerate}
+  \end{enumerate}
+  Note that for the Logistic Regression, Multi-Layer Perceptron, and LightGBM classifiers, I manually tuned hyperparameter values until I could no longer improve the classifiers' ROC AUC scores on the validation set. In the interest of time, I decided to hold off on using GridSearchCV again until I had identified highest performing classifier/featureset combination during the refinement phase. At that time I would perform one final round of hyperparameter tuning on the best performing classifier up to that point. As I trained and scored each classifier during the implementation phase, it became clear to me that I would be able to identify the most promising classifier without extensive tuning of each classifier's hyperparameters.
+
 \subsection{Refinement}
+Below are the ROC AUC scores of each classifier's predictions on the validation set, after each classifier has been trained on the full featureset of 251 features:
+
+\begin{table}[ht]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{All Features} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.546645662333944 \\
+   \hline
+   AdaBoost & 0.7462758964509755 \\
+   \hline
+   Logistic Regression & 0.7471756350178691 \\
+   \hline
+   Multi-layer Perceptron & 0.7429017839300756 \\
+   \hline
+   LightGBM & 0.7592132612569703 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the full featureset.}
+ \label{table:1}
+\end{table}
+
+It's immediately clear that LightGBM's performance is head and shoulders above the rest of the classifiers, with an ROC AUC score that's more than a full percentage point higher than that of the second best performing classifier, Logistic Regression. What's more, I observed that LightGBM could be trained in less time than most of the other classifiers, particularly AdaBoost.
+
+I next wanted to see if reducing the dimensionality of the featureset's 67 numerical features would enable one of the above classifiers to surpass LightGBM's ROC AUC score of \colorbox{backcolor}{\textcolor{red}{\texttt{0.7592}}}. I followed these steps to apply PCA to the training and validation datasets :
+\begin{enumerate}
+  \item Fit PCA on all 67 numerical features, trying different values for the n_components parameter in order to determine how many principle components are needed to explain roughly 90\% of the variance in the numerical features.
+  \item I discovered that 17 principle components will explain approximately 90\% of the variance in all the numerical features:
+  \begin{lstlisting}
+Explained variance ratios for each component:
+[ 0.1712049   0.12231898  0.09857175  0.06724392
+  0.05962164  0.05682911  0.05083881  0.04976384
+  0.04510004  0.04230571  0.02981382  0.02512118
+  0.01950228  0.01827228  0.01581516  0.0155643
+  0.01255201]
+
+90.04% of variance of numerical features
+explained by 17 components.
+  \end{lstlisting}
+  \item I then fit a PCA algorithm (with n_components parameter set to 17) to all 67 numerical features in the training set, and used it to transform the training set's numerical features, reducinging them to just 17 features:
+  \begin{lstlisting}
+reduced_numerical_data =
+pca.transform(X_train_processed[numerical_features])
+  \end{lstlisting}
+  \item I next created a dataframe to store these reduced features.
+  \item Finally, I dropped all 67 numerical features from the original preprocessed training dataframe, so that it only contained the 184 binary categorical features. I then merged the dataframe containing the PCA-reduced numerical features back to this dataframe, resulting in a training set with 201 features.
+  \item I also used the above PCA algorithm that had been fit on the training data to transform the validation set's 67 numerical features into their 17 PCA-reduced counterparts.
+\end {enumerate}
+
+I then trained my five classifier algorithms (with hyperparameters unchanged) on this PCA-reduced training set of 201 total features, and used them to make predictions on the validation set after it had also been processed to account for the PCA dimensionality reduction.
+
+\begin{table}[ht]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{PCA} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.5452255614331999 \\
+   \hline
+   AdaBoost & 0.7415669749755673 \\
+   \hline
+   Logistic Regression & 0.743963963781135 \\
+   \hline
+   Multi-layer Perceptron & 0.7439527449175637 \\
+   \hline
+   LightGBM & 0.7483887050110797 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the 17 PCA-reduced numerical features and 184 binary features.}
+ \label{table:2}
+\end{table}
+
+Unfortunately, other than the score of the Multi-Layer Perceptron, which had a slight improvement, all other classifiers' ROC AUC scores on the validation set dropped after using PCA to reduce the dimension space of the numerical features. Notably, my LightGBM classifier's score, although still better than those of all other classifiers, fell more than a full percentage point to \colorbox{backcolor}{\textcolor{red}{\texttt{0.7483}}}. I could only conclude that there must be certain numerical features that were more valuable to my learning algorithms in their unreduced, original dimensions.
+
+I still wanted to test my final hypothesis, which was that a select group of features taken from the original 251 numerical and binary features would enable one or more of my learning algorithms to improve their ROC AUC scores on the validation set. I implemented SelectKBest with different values of K to see if there is a group of K features that results in improved performance of the learning algorithms when they are trained on just these K features.
+
+\begin{table}[h!]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{SelectKBest, K=20} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.6833259704479555 \\
+   \hline
+   AdaBoost & 0.7376556539610273 \\
+   \hline
+   Logistic Regression & 0.7353141520826144 \\
+   \hline
+   Multi-layer Perceptron & 0.7340542201102302 \\
+   \hline
+   LightGBM & 0.7347991347869498 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the top 20 features chosen using SelectKBest, K=20.}
+ \label{table:3}
+\end{table}
+
+\begin{table}[h!]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{SelectKBest, K=30} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.6748662184461512 \\
+   \hline
+   AdaBoost & 0.7330739254581403 \\
+   \hline
+   Logistic Regression & 0.7367180213600446 \\
+   \hline
+   Multi-layer Perceptron & 0.7358901049573279 \\
+   \hline
+   LightGBM & 0.7394787228642934 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the top 30 features chosen using SelectKBest, K=30.}
+ \label{table:4}
+\end{table}
+
+\pagebreak
+
+\begin{table}[h!]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{SelectKBest, K=60} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.6684098231997853 \\
+   \hline
+   AdaBoost & 0.7438097973020747 \\
+   \hline
+   Logistic Regression & 0.7417987588406878 \\
+   \hline
+   Multi-layer Perceptron & 0.7403314315263486 \\
+   \hline
+   LightGBM & 0.7522811504663048 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the top 60 features chosen using SelectKBest, K=60.}
+ \label{table:5}
+\end{table}
+
+\begin{table}[h!]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{SelectKBest, K=120} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.6522417061567687 \\
+   \hline
+   AdaBoost & 0.7477080344062966 \\
+   \hline
+   Logistic Regression & 0.7462061715711668 \\
+   \hline
+   Multi-layer Perceptron & 0.7422206488500489 \\
+   \hline
+   LightGBM & 0.7559874806914961 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the top 120 features chosen using SelectKBest, K=120.}
+ \label{table:6}
+\end{table}
+
+\begin{table}[h!]
+  \centering
+  \definecolor{lightgray}{gray}{0.92}
+  {\rowcolors{2}{white}{lightgray}
+  \begin{tabular}{|| l | l ||}
+   \hline
+   \multicolumn{2}{|c|}{SelectKBest, K=200} \\
+   \hline
+   \rowcolor{white} \textbf{Classifier} & \textbf{ROC AUC Score} \\ [0.5ex]
+   \hline\hline
+   Naive Bayes & 0.6368790945859744 \\
+   \hline
+   AdaBoost & 0.7498569541301328 \\
+   \hline
+   Logistic Regression & 0.74715371178638 \\
+   \hline
+   Multi-layer Perceptron & 0.7438126377468326 \\
+   \hline
+   LightGBM & 0.7581504347134562 \\ [1ex]
+   \hline
+  \end{tabular}
+ }
+ \caption{Validation set prediction ROC AUC scores of classifiers trained on the top 200 features chosen using SelectKBest, K=200.}
+ \label{table:7}
+\end{table}
+
+Although the performance of the Naive Bayes classifier saw substantial improvement when the featurespace was reduced to K=20 features, its ROC AUC score was still much lower than those of the four other classifiers. And as for those four other classifiers, the trend here is unmistakable: these classifiers' ROC AUC scores dropped significantly when the featurespace was reduced to 20 features (LightGBM's score was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7348}}}), and then steadily increased as the feature space was increased to K=30, 60, 120, and finally, 200 features. At K=200, LightGBM's score was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7582}}}.
+
+This was the clearest possible confirmation that my best performing learning algorithm, LightGBM, would perform at its best when trained on the full featurespace of 251 features. This combination had provided, so far, a top ROC AUC score of \colorbox{backcolor}{\textcolor{red}{\texttt{0.7592}}} on the validation set.
+
+However, before using this classifier to compute predictions on the test set in order to submit to Kaggle, I wanted to first see if I could further optimize its hyperparameters using GridSearchCV.
+
+I encountered a few unexpected hiccups when setting up GridSearchCV to tune a LightGBM classifier:
+\begin{enumerate}
+  \item It turned out that I needed to use the LGBMClassifier() class to initialize my LightGBM classifier and then directly specify its parameter values before passing the classifier itself as a parameter to GridSearchCV. (When training a standalone LightGBM classifier, I'd ordinarily only need to need to call LightGBM's train() method and pass it a single dictionary containing all the hyperparameter values.) For example:
+  \begin{lstlisting}
+# Create an LightGBM classifier object
+clf = lgb.LGBMClassifier(boosting_type = 'gbdt',
+                         objective = 'binary',
+                         metric = 'auc')
+  \end{lstlisting}
+  \item I did not need to convert the dataset to LightGBM format prior to passing it to the GridSearchCV object's fit() method.
+  \item Unlike plain LightGBM, whose predict() method returns a list
+  of prediction probabilities that I can pass directly to Sklearn's roc_auc method to calculate the ROC AUC score, in order access the ROC AUC score of the LightGBM hyperparameter combination returned by GridSearchCV, I must call GridSearchCV's predict_proba() method, slice it to access the second column of the array that it returns, and then pass this list as a parameter to roc_auc:
+  \begin{lstlisting}
+roc_auc_score(y_test,grid.predict_proba(X_test_final)[:,1])
+  \end{lstlisting}
+  \item Finally, and most significantly, LightGBM has far too many hyperparameters than could be thoroughly investigated by running GridSearchCV locally on my laptop.
+\end{enumerate}
+
+My approach was thus to use GridSearchCV to investigate the interplay between LightGBM's num_iterations, num_leaves, and learning_rate hyperparameters, and to develop intuition about which combination of these parameters' values would work best with my data's full featureset. I found that having a num_iterations value of at least 10,000, with a learning_rate near 0.001, and num_leaves value of 200 led to the highest ROC AUC score.
+
+I then spent some time using trial and error to manually tune some of the other LightGBM hyperparameters. I will evaluate each of these parameters in detail in the section below. Suffice to say, I was ultimately able to come up with a set of hyperparameter values that gave my LightGBM classifier a validation set ROC AUC score of \colorbox{backcolor}{\textcolor{red}{\texttt{0.7609}}} after training on the full featureset of 251 features.
+
+I then took this LightGBM classifier, trained it on the entire original training set's 307,511 rows, made predictions for each borrower in the test set's 48,744 rows, and submitted these predictions to Kaggle as a CSV file. My submission's public leaderboard score (based on 20\% of the test set's rows) is currently \colorbox{backcolor}{\textcolor{red}{\texttt{0.745}}}:
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{kaggle-submission-LightGBM-full-featureset}
+\centering
+\caption{Kaggle Home Credit competition public leaderboard score as of June 27, 2018.}
+\end{figure}
+
+As of June 27, 2018, my submission's public leaderboard ranking was 2,512 out of 3,484, which placed my submission in the top 73\% of entrants.
 
 \section{Results}
 \subsection{Model Evaluation and Validation}
+In deciding which learning model to use, I had to answer three questions:
+\begin{enumerate}
+  \item Which learning algorithm?
+  \item Trained on a featureset of what scope?
+  \item Employing which hyperparameter values?
+\end{enumerate}
+
+As is evident from my above description of the refinement process, using LightGBM was a no-brainer:
+\begin{itemize}
+  \item Its ROC AUC score for predictions on the validation set, even with minimal time spent on hyperparameter tuning, was usually one full percentage point higher than the next best algorithm, regardless of training data's featureset.
+  \item Except for Naive Bayes, LightGBM trains much faster than all other algorithms I tried.
+  \item Therefore, even though it's within the realm of possibility that there may exist a combination of parameters for, say, an AdaBoost algorithm that might beat LightGBM's best possible performance, because AdaBoost trains so slowly, the chance of discovering these parameters, if they even exist, is all the more remote.
+  \item Indeed, LightGBM's efficient use of time and compute resources allows me to perform far more iterations of hyperparameter tuning than would be possible with the three other competitive learning algorithms I explored.
+  \item Which gives me further confidence that the top performing hyperparameter values that I found for LightGBM will beat any combination of hyperparameter values that I might reasonably discover for any one of the other learning algorithms.
+\end{itemize}
+
+As for scope of featureset, it was also clear from my experiments with PCA and SelectKBest that any reduction in the dimension or number of features immediately caused performance to drop. It was obvious that best results would be obtained only when training on all of the training set's 251 total features.
+
+My highest scoring LightGBM model had the following hyperparameter values:
+
+\begin{lstlisting}
+# Final parameters for LightGBM training
+params = {}
+params['num_iterations'] = 15000
+params['learning_rate'] = 0.001
+params['boosting_type'] = 'gbdt'
+params['objective'] = 'binary'
+params['metric'] = 'auc'
+params['num_leaves'] = 200
+params['max_depth'] = 20
+params['max_bin'] = 110
+params['lambda_l2'] = 0.1
+params['bagging_freq'] = 1
+params['bagging_fraction'] = 0.95
+params['bagging_seed'] = 1
+params['feature_fraction'] = 0.9
+params['feature_fraction_seed'] = 1
+params['random_state'] = 42
+\end{lstlisting}
+
+All in all, when tuning LightGBM hyperparameters, the goal is to achieve the highest possible accuracy while at the same time doing the most to mitigate against overfitting. \cite{lightgbmparams} \cite{lightgbmparamtuning}
+
+\begin{itemize}
+  \item \textbf{num_iterations}: The number of boosting iterations run by the classifier. A larger value can help improve accuracy. My model's performance improved as I raised this to 10,000 and then 15,000. Any higher and performance began to drop off ever so slightly. I once tried training for 100,000 iterations but this also did not result in improved performance.
+  \item \textbf{learning_rate}: The shrinkage rate. Best performance was achieved when this was one less negative degree of magnitude than num_iterations' positive degree of magnitude. Through GridSearchCV I discovered that if num_iterations was around $10^{4}$, then learning_rate should be $10^{-3}$.
+  \item \textbf{boosting_type}: Type of gradient boosting algorithm. `gbdt,' or ``Gradient Boosting Decision Tree" is the default value and also what I used.
+  \item \textbf{objective}: Specifies the desired type of classification or regression according to the problem's goal. Obviously `binary' was the appropriate choice for this project.
+  \item \textbf{metric}: Metrics that will be evaluated on the evaluation sets. `AUC' (area under curve) was the appropriate choice given this project's evaluation metric.
+  \item \textbf{num_leaves}: The maximum number of leaves in one tree. Through GridSearchCV I found that 200 was a good value for my model.
+  \item \textbf{max_depth}: Limits the max depth of the tree model. LightGBM leaves this unspecified by default. However, limiting max_depth is one good way to prevent overfitting, and I found that limiting my model's max_depth to 20 was ideal.
+  \item \textbf{max_bin}: The number of bins (memory) that feature values will be bucketed into. The default value is 255, but smaller values can help prevent overfitting. I found that a value of 110 worked best.
+  \item \textbf{lambda_l2}: L2 regularization value. Also helps prevent overfitting. I used 0.1 for this value.
+  \item \textbf{bagging_freq}: Tells the model how often it should randomly select part of the data without resampling. A value of 10 means every 10 iterations the model selects a particular fraction of the data without resampling. This speeds up training and can deal with overfitting. I found that a value of 1, or bagging on every iteration, resulted in best performance.
+  \item \textbf{bagging_fraction}: The fraction of data to be used on each bagging iteration. I used 0.95, just shy of all of the data.
+  \item \textbf{bagging_seed}: Random seed for bagging.
+  \item \textbf{feature_fraction}: If specified, LightGBM only selects a random fraction of total features on each iteration. Similar to bagging, this parameter helps speed up training and prevent overfitting. Using 0.9 here worked best for me.
+  \item \textbf{feature_fraction_seed}: Random seed for feature_fraction.
+  \item \textbf{random_state}: General random number seed.
+\end{itemize}
+
+During the refinement phase, I confirmed that LightGBM was both robust to variations of the training data's input space, and able to generalize well to unseen data. When holding its hyperparameters constant, LightGBM's ROC AUC scores on the validation set were only slightly lower (no more than one or two percentage points below the highest score achieved when LightGBM was trained on the full featureset) when the the algorithm was trained on the PCA-reduced featureset, or any of the smaller feature sets (of sizes 20, 30, 60, 120, and 200) that were compiled by SelectKBest.
+
+Furthermore, after final hyperparameter tuning, and after being trained once more on the \textit{full} training set of 307,511 rows and making predictions on the never-before-seen testing set of 48,744 rows, my model still had an ROC AUC score of \colorbox{backcolor}{\textcolor{red}{\texttt{0.745}}} on the 20\% of its testing set predictions that are currently publicly scored on Kaggle. This is only 1.5 percentage points lower than (or nearly 98\% of) this completely tuned model's ROC AUC score of \colorbox{backcolor}{\textcolor{red}{\texttt{0.7609}}} that it achieved on the validation set. Indeed, because the validation set contains upwards of 65,000 rows in total, I am optimistic that my current submission's Kaggle score may improve once its predictions on the remaining 80\% of the test set are factored into its score once the competition ends.
+
 \subsection{Justification}
+My benchmark score for this project is the ROC AUC score of predictions on the validation set that have been made by a Guassian Naive Bayes classifier that has been trained on the full featurespace of 251 features. This benchmark score turned out to be \colorbox{backcolor}{\textcolor{red}{\texttt{0.5466}}}. Both my final model's ROC AUC scores (of \colorbox{backcolor}{\textcolor{red}{\texttt{0.7609}}} on the validation set and \colorbox{backcolor}{\textcolor{red}{\texttt{0.745}}} on Kaggle completely blew this benchmark out of the water -- they both represent approximately a 50\% increase in performance above this benchmark.
+
+I believe it is more interesting to compare my final model's performance to my secondary benchmark, which was the average public ROC AUC score on Kaggle of all submissions to this competition as of June 2, 2018. This secondary benchmark score was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. My final model's public score on Kaggle is just over one percentage point higher than this average at an ROC AUC score of \colorbox{backcolor}{\textcolor{red}{\texttt{0.745}}}. This indicates that my final model is currently performing, at least by Kaggle standards, averagely. Although there are many areas where I could improve my approach, as will be discussed below, seeing as how this is my first Kaggle competition, and my first time using machine learning methods to interpret a real-world, somewhat messy dataset, I am quite pleased with my final model's ``average" performance.
+
+All in all, I have been able to create a model that is able to locate approximately 75\% of borrowers that will turn out to be delinquent repayers (finding the true positives) before incorrectly predicting that a borrower who will end up repaying their loan on-time is a delinquent repayer (misidentifying a true negative as a false positive). Though the current top public score on Kaggle is an ROC AUC of 0.803, my final model more than outperforms a random classifier (which would have an ROC AUC of 0.5), and also beats both my primary and secondary benchmarks. For the intents and purposes of this project, I believe it's safe to say that my model has adequately solved the problem of predicting whether a borrower will or will not eventually be a delinquent repayer.
 
 \section{Conclusion}
 \subsection{Free-Form Visualization}
+Below are plots of ROC curves for each classifier and featureset on which it was trained.
+
+\pagebreak
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{ReceiverOperatingCharacteristicCurves}
+\centering
+\caption{ROC Curves of each classifier and featureset}
+\end{figure}
+
+The next plot displays the top 50 feature importances of the best performing LightGBM algorithm after it had been trained on the full featureset.
+
+\pagebreak
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{lightGBMFeatureImportances}
+\centering
+\caption{Top 50 feature importances of the best LightGBM model}
+\end{figure}
+
+The 15 most useful features for my LightGBM model are all numerical. Indeed, none of the three categorical features that I had engineered earlier made it into the top 50 features depicted above. If I had it to do all over again, I would have kept \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}} as a numerical feature instead of re-engineering it into the binary \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}} feature.
+
 \subsection{Reflection}
+By far and away, the most challenging part of this project was understanding the dataset and all the quirks of its various features. I budgeted the majority of my time toward understanding what information each feature contained, how this information was distributed, and what sort of preprocessing techniques would need to be applied.
+
+Dealing with the dataset's overabundance of missing values, or `NaN' entries, proved to be trickiest part of the data preprocessing phase. Most machine learning algorithms aren't designed to overlook missing entries, and so I had no choice but to come up with a strategy to work around this. I ultimately decided it was wisest to make a first attempt that used all the dataset's features, imputing any missing `NaN' values in numerical and categorical features according to the conventions and processes that seemed most reasonable to me. If I had more time, I would have liked to experiment with omitting some of the features with the most `Nan' values, or perhaps experimenting with different approaches to imputing missing values.
+
+The most straightforward part of my process was chooising which learning algorithm to use. LightGBM was head and shoulders above every other algorithm I tried, both in terms of speed of training and in terms of its final ROC AUC score. If I had access to more compute power, I might have tried out the XGBOOST algorithm as well, but facing the limitation of training my learning algorithm locally on my laptop, I felt that attempting LightGBM alone was more than adequate for my solution.
+
+Finally, thanks to LightGBM's training speed, the process of tuning its hyperparameters wasn't terribly painful. I am confident that I was able to thoroughly explore the ranges most of the hyperparameters one-by-one. However, I did unfortunately have to leave one stone mostly un-turned: I wasn't able to fully explore the interrelationships between \textit{all} of LightGBM's hyperparameters. Although I did make some headway using GridSearchCV, I had to accept that given the compute limitations of my laptop, there was only so much investigation that could be accomplished.
+
 \subsection{Improvement}
+Absent any large-scale comprehensive exploration of LightGBM's hyperparameters using GridSearchCV, I don't believe that there is much more to be gained from continuing to tweak my model's hyperparameters.
+
+Instead, I believe that the lowest hanging fruit would be for me to bring into my dataset all the features from the six other data tables provided by Home Credit. After noticing how my model's ROC AUC score increased as I broadened the scope of features on which it was trained, I couldn't help but wonder if adding features from the data tables I had originally declined to include in this project might help my model's performance get that much closer to the current highest submissions on Kaggle.
+
+Additionally, while researching various techniques that I might apply to this project, I came across a type of ensemble generation called stacking. In a nutshell, stacking is a method for building a learning ensemble that combines the predictive powers of several machine learning algorithms. The individual base level learning algorithms are each first trained on the training dataset. And the reason this technique is called stacking is because once this first round of training is complete, a higher level algorithm, or meta-model, is trained that uses the outputs of the base level models as input features.\cite{statsandbots}
+
+I am hopeful that ensemble learning methods, such as stacking, will help close the gap between my model's current performance and the higher scores on the competition's leaderboard.
 
 \begin{appendices}
 \section{Data Table Descriptions}
@@ -1174,29 +1690,28 @@ I divided the main data table's 120 features into groups based both on whether t
 \end{enumerate}
 \normalsize
 
-\subsection{Categorical features needing one-hot encoding after re-engineering their category definitions}
-\label{catfeatneedreengineering}
-\footnotesize
-\begin{enumerate}
- \item CNT_CHILDREN (having no children vs. at least one child)
- \item \textcolor{red}{CNT_FAM_MEMBERS (family size of 1 vs. 2 vs. 3 or more) (2 `NaN' entries)}
-\end{enumerate}
-\normalsize
-
 \subsection{Categorical features originally mis-identified by Home Credit as normalized (they also need to be one-hot encoded)}
 \label{catfeatorigmisidentified}
 \footnotesize
 \begin{enumerate}
  \item \textcolor{red}{EMERGENCYSTATE_MODE (145,755 `NaN' entries)}
- \item \textcolor{red}{TOTALAREA_MODE (148,431 `NaN' entries)}
  \item \textcolor{red}{HOUSETYPE_MODE (154,297 `NaN' entries)}
  \item \textcolor{red}{WALLSMATERIAL_MODE (156,341 `NaN' entries)}
  \item \textcolor{red}{FONDKAPREMONT_MODE (210,295 `NaN' entries)}
 \end{enumerate}
 \normalsize
 
-\subsection{Categorical features already one-hot encoded}
-\label{catfeatalreadyonehotencoded}
+\subsection{Categorical features needing re-engineering}
+\label{catfeatneedreengineering}
+\footnotesize
+\begin{enumerate}
+ \item CNT_CHILDREN: Will be transformed into a binary categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_CHILDREN}}}, with value of 1 if borrower has 0 children vs. a value of 1 if borrower has at least one child.
+ \item \textcolor{red}{CNT_FAM_MEMBERS (2 `NaN' entries)}: Will be transformed into categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}}, with values of 'one', 'two', or 'three_plus' depending on whether the borrower's value for \colorbox{backcolor}{\textcolor{black}{\texttt{CNT_FAM_MEMBERS}}} was 1, 2, or 3 or more. \colorbox{backcolor}{\textcolor{black}{\texttt{NUMBER_FAMILY_MEMBERS}}} will eventually be one-hot encoded.
+\end{enumerate}
+\normalsize
+
+\subsection{Binary Categorical features already one-hot encoded}
+\label{binarycatfeatalreadyonehotencoded}
 \footnotesize
 \begin{enumerate}
  \item FLAG_MOBIL
@@ -1234,18 +1749,22 @@ I divided the main data table's 120 features into groups based both on whether t
 \end{enumerate}
 \normalsize
 
-\subsection{Numerical features not identified as normalized}
-\label{numericalfeatnotnormalized}
+\subsection{Numerical features not identified as normalized, that have roughly normal distributions}
+\label{numericalfeatnotnormalizednormalshape}
+\footnotesize
+\begin{enumerate}
+ \item DAYS_BIRTH
+ \item DAYS_ID_PUBLISH
+ \item HOUR_APPR_PROCESS_START
+\end{enumerate}
+\normalsize
+
+\subsection{Numerical features not identified as normalized, that have skewed distributions}
+\label{numericalfeatnotnormalizedskewed}
 \footnotesize
 \begin{enumerate}
  \item AMT_INCOME_TOTAL
  \item AMT_CREDIT
- \item DAYS_BIRTH
- \item DAYS_EMPLOYED
- \item DAYS_REGISTRATION
- \item DAYS_ID_PUBLISH
- \item HOUR_APPR_PROCESS_START
- \item \textcolor{red}{DAYS_LAST_PHONE_CHANGE (1 `NaN' entry)}
  \item \textcolor{red}{AMT_ANNUITY (12 `NaN' entries)}
  \item \textcolor{red}{AMT_GOODS_PRICE (278 `NaN' entries)}
  \item \textcolor{red}{OBS_30_CNT_SOCIAL_CIRCLE (1,021 `NaN' entries)}
@@ -1262,13 +1781,23 @@ I divided the main data table's 120 features into groups based both on whether t
 \end{enumerate}
 \normalsize
 
-\subsection{Numerical features identified as normalized}
-\label{numericalfeatnormalized}
+\subsection{Numerical features not identified as normalized, that have skewed distributions and negative values}
+\label{numericalfeatnotnormalizedskewedneg}
 \footnotesize
 \begin{enumerate}
- \item REGION_POPULATION_RELATIVE
+  \item DAYS_EMPLOYED: Will be transformed into a binary categorical feature called \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}}, with value of 1 if borrower has a value of 0 or less for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}. \colorbox{backcolor}{\textcolor{black}{\texttt{HAS_JOB}}} will have a value of 0 if the borrower is one of the 55,374 folks who has a value of 365243 for \colorbox{backcolor}{\textcolor{black}{\texttt{DAYS_EMPLOYED}}}.
+  \item DAYS_REGISTRATION
+  \item \textcolor{red}{DAYS_LAST_PHONE_CHANGE (1 `NaN' entry)}
+\end{enumerate}
+\normalsize
+
+\subsection{Numerical features identified as normalized, which are scaled to range [0,1]}
+\label{numericalfeatnormalizedunitrange}
+\footnotesize
+\begin{enumerate}
  \item \textcolor{red}{EXT_SOURCE_2 (660 `NaN' entries)}
  \item \textcolor{red}{EXT_SOURCE_3 (60,965 `NaN' entries)}
+ \item \textcolor{red}{TOTALAREA_MODE (148,431 `NaN' entries)}
  \item \textcolor{red}{YEARS_BEGINEXPLUATATION_AVG (150,007 `NaN' entries)}
  \item \textcolor{red}{YEARS_BEGINEXPLUATATION_MODE (150,007 `NaN' entries)}
  \item \textcolor{red}{YEARS_BEGINEXPLUATATION_MEDI (150,007 `NaN' entries)}
@@ -1315,13 +1844,21 @@ I divided the main data table's 120 features into groups based both on whether t
 \end{enumerate}
 \normalsize
 
+\subsection{Numerical features identified as normalized, which \textit{not} are scaled to range [0,1]}
+\label{numericalfeatnormalizednotunitrange}
+\footnotesize
+\begin{enumerate}
+ \item REGION_POPULATION_RELATIVE
+\end{enumerate}
+\normalsize
+
 \pagebreak
 
 \section{Main Data Table Numerical Feature Distributions}
 \label{appendix:maindatatablefeaturedistributions}
 
 \subsection{Main Data Table Normalized Feature Distributions}
-\label{normalfeaturedistibs}
+\label{normalfeaturedistribs}
 
 \begin{figure}[ht]
 \includegraphics[width=0.89\textwidth]{main-data-table-normal-feature-distribs-p1}
@@ -1356,7 +1893,7 @@ I divided the main data table's 120 features into groups based both on whether t
 \pagebreak
 
 \subsection{Main Data Table Non-normalized Feature Distributions}
-\label{nonnormalfeaturedistibs}
+\label{nonnormalfeaturedistribs}
 
 \begin{figure}[ht]
 \includegraphics[width=0.89\textwidth]{main-data-table-non-normal-feature-distribs-p1}

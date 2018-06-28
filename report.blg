@@ -1,15 +1,15 @@
 [0] Config.pm:302> INFO - This is Biber 2.11
 [0] Config.pm:305> INFO - Logfile is 'report.blg'
-[40] biber-darwin:313> INFO - === Sat Jun 16, 2018, 12:42:20
-[65] Biber.pm:371> INFO - Reading 'report.bcf'
-[152] Biber.pm:857> INFO - Found 7 citekeys in bib section 0
-[166] Biber.pm:3976> INFO - Processing section 0
-[181] Biber.pm:4136> INFO - Looking for bibtex format file 'capstone.bib' for section 0
-[182] bibtex.pm:1500> INFO - LaTeX decoding ...
-[190] bibtex.pm:1316> INFO - Found BibTeX data source 'capstone.bib'
-[226] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[226] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[226] Biber.pm:3804> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
-[226] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
-[240] bbl.pm:617> INFO - Writing 'report.bbl' with encoding 'UTF-8'
-[243] bbl.pm:720> INFO - Output to report.bbl
+[38] biber-darwin:313> INFO - === Thu Jun 28, 2018, 00:19:15
+[61] Biber.pm:371> INFO - Reading 'report.bcf'
+[159] Biber.pm:857> INFO - Found 13 citekeys in bib section 0
+[173] Biber.pm:3976> INFO - Processing section 0
+[186] Biber.pm:4136> INFO - Looking for bibtex format file 'capstone.bib' for section 0
+[188] bibtex.pm:1500> INFO - LaTeX decoding ...
+[203] bibtex.pm:1316> INFO - Found BibTeX data source 'capstone.bib'
+[267] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[267] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[267] Biber.pm:3804> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
+[267] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
+[282] bbl.pm:617> INFO - Writing 'report.bbl' with encoding 'UTF-8'
+[287] bbl.pm:720> INFO - Output to report.bbl

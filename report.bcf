@@ -1975,14 +1975,22 @@
   </bcf:bibdata>
   <bcf:section number="0">
     <bcf:citekey order="1">homecreditwebsite</bcf:citekey>
-    <bcf:citekey order="2">kagglehomecreditcompetitionoverview</bcf:citekey>
-    <bcf:citekey order="3">kagglehomecreditcompetitiondata</bcf:citekey>
-    <bcf:citekey order="4">wikipediaroc</bcf:citekey>
-    <bcf:citekey order="5">mlwikirocanalysis</bcf:citekey>
-    <bcf:citekey order="6">kagglehomecreditcompetitionpublicleaderboard</bcf:citekey>
-    <bcf:citekey order="7">githubprojectrepo</bcf:citekey>
-    <bcf:citekey order="8">kagglehomecreditcompetitiondata</bcf:citekey>
-    <bcf:citekey order="9">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="2">2017arXiv170704831Y</bcf:citekey>
+    <bcf:citekey order="3">kagglehomecreditcompetitionoverview</bcf:citekey>
+    <bcf:citekey order="4">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="5">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="6">wikipediaroc</bcf:citekey>
+    <bcf:citekey order="7">mlwikirocanalysis</bcf:citekey>
+    <bcf:citekey order="8">lightgbmdocs</bcf:citekey>
+    <bcf:citekey order="9">lightgbmdocs</bcf:citekey>
+    <bcf:citekey order="10">vidhyalightgbm</bcf:citekey>
+    <bcf:citekey order="11">kagglehomecreditcompetitionpublicleaderboard</bcf:citekey>
+    <bcf:citekey order="12">githubprojectrepo</bcf:citekey>
+    <bcf:citekey order="13">lightgbmparams</bcf:citekey>
+    <bcf:citekey order="14">lightgbmparamtuning</bcf:citekey>
+    <bcf:citekey order="15">statsandbots</bcf:citekey>
+    <bcf:citekey order="16">kagglehomecreditcompetitiondata</bcf:citekey>
+    <bcf:citekey order="17">kagglehomecreditcompetitiondata</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="ynt">

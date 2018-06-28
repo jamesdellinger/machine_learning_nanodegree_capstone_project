@@ -23,6 +23,9 @@ plt.style.use('fivethirtyeight')
 # Make plots smaller
 sns.set_context('paper')
 
+# For plotting ROC curves of classifiers
+from sklearn.metrics import roc_curve, roc_auc_score, auc
+
 def plot_feature_distributions(data, title, figsize, num_cols):
     """
     Plot distributions of a dataset's continuous features as histograms.
@@ -74,3 +77,64 @@ def plot_feature_distributions(data, title, figsize, num_cols):
 
     # Save the plot to a png file
     fig.savefig('{}.png'.format(title))
+
+def plot_roc_curves(y_test, y_score_list, clf_label_list, title):
+    """
+    Plots ROC curves of a various classifiers' prediction probabilities.
+    Also plots the mean ROC curve of all classifiers' curves.
+
+    Parameters:
+        y_test: The target values
+        y_score_list: A list containing sets of prediction probabilities
+                      on the target values made by various classifiers.
+        clf_label_list: List of strings. Each string is a name of a classifier.
+                        The order of this list corresponds to the order of the
+                        prediction sets in y_score_list.
+        tite: String, the title of the plot
+    """
+    # Set the size and dpi of the plot
+    plt.figure(figsize = (10,10), dpi=300)
+
+    # Lists to store the true positive rates and roc auc scores
+    # for each classifier
+    tprs = []
+    roc_aucs = []
+    # Mean true positive rate of all classifiers
+    mean_fpr = np.linspace(0, 1, 100)
+
+    i=0
+    # Calculate the roc score and plot the roc curve for each
+    # set of prediction probabilities in y_score_list. Use the
+    # corresponding labels in clf_label_list to identify which
+    # ROC curve belongs to which classifier.
+    for y_score in y_score_list:
+        clf_label = clf_label_list[i]
+        i += 1
+        fpr, tpr, thresholds = roc_curve(y_test, y_score)
+        tprs.append(np.interp(mean_fpr, fpr, tpr))
+        tprs[-1][0] = 0.0
+        roc_auc = roc_auc_score(y_test, y_score)
+        roc_aucs.append(roc_auc)
+        plt.plot(fpr, tpr, lw=3, alpha=0.8, label='{} ROC (AUC = %0.6f)'.format(clf_label) % roc_auc)
+
+    # Plot the ROC curve of a random classifier
+    plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r', label='Luck (AUC = 0.500000)', alpha=.8)
+
+    # Calculate the mean true positive rate and plot it
+    mean_tpr = np.mean(tprs, axis=0)
+    mean_tpr[-1] = 1.0
+    mean_auc = auc(mean_fpr, mean_tpr)
+    std_auc = np.std(roc_aucs)
+    plt.plot(mean_fpr, mean_tpr, color='b', label=r'Mean ROC all classifiers (AUC = %0.2f $\pm$ %0.2f)' % (mean_auc, std_auc), lw=2, alpha=.3)
+
+    # Set the properties of the plot's axes and labels
+    plt.xlim([-0.05, 1.05])
+    plt.ylim([-0.05, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc="lower right")
+    # Save the plot to a png file
+    plt.savefig('{}.png'.format(title))
+    # Display the plot
+    plt.show()

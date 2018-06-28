@@ -19,6 +19,36 @@
 
 \refsection{0}
   \datalist[entry]{ynt/global//global/global}
+    \entry{2017arXiv170704831Y}{article}{}
+      \name{author}{1}{}{%
+        {{hash=abd245262d9b92e28a5a75b3bae00021}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Xiaojiao},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{fullhash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{bibnamehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{authorbibnamehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{authornamehash}{abd245262d9b92e28a5a75b3bae00021}
+      \strng{authorfullhash}{abd245262d9b92e28a5a75b3bae00021}
+      \field{labelalpha}{Yu17}
+      \field{sortinit}{2}
+      \field{sortinithash}{cbff857e587bcb4635511624d773949e}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{q-fin.RM}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{ArXiv e-prints}
+      \field{month}{7}
+      \field{title}{{Machine learning application in online lending risk prediction}}
+      \field{year}{2017}
+      \verb{eprint}
+      \verb 1707.04831
+      \endverb
+      \keyw{Quantitative Finance - Risk Management}
+    \endentry
     \entry{homecreditwebsite}{online}{}
       \name{author}{1}{}{%
         {{hash=b2cb4f23abfc34a03ff7d28a751597ae}{%

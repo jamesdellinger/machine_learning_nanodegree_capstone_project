@@ -45,13 +45,13 @@ sorting=ynt
 
 \title{Capstone Project Proposal\\[8pt]
 \normalsize{Udacity Machine Learning Nanodegree}}
-\date{June 5, 2018}
+\date{June 22, 2018}
 \author{James Dellinger}
 \begin{document}
 \maketitle
 
 \section{Domain Background}
-For my capstone project I will participate in the \href{https://www.kaggle.com/c/home-credit-default-risk}{Home Credit Default Risk competition} on Kaggle\cite{kagglehomecreditcompetitionoverview}. The goal of the competition is to be able to predict the likelihood that an applicant will experience difficulty in repaying their loan. The competition is sponsored by \href{http://www.homecredit.net}{Home Credit}\cite{homecreditwebsite}, whose mission is to provide a positive and safe borrowing experience to groups of people that traditional, mainstream banks and financial institutions typically refuse to serve.
+For my capstone project I will participate in the \href{https://www.kaggle.com/c/home-credit-default-risk}{Home Credit Default Risk competition} on Kaggle\cite{kagglehomecreditcompetitionoverview}. The goal of the competition is to be able to predict the likelihood that an applicant will experience difficulty in repaying their loan. The competition is sponsored by \href{http://www.homecredit.net}{Home Credit}\cite{homecreditwebsite}, whose mission is to provide a positive and safe borrowing experience to groups of people that traditional, mainstream banks and financial institutions typically refuse to serve. The competition's dataset is available for download directly from `Data' section of its \href{https://www.kaggle.com/c/home-credit-default-risk/data}{Kaggle webpage}\cite{kagglehomecreditcompetitiondata}. There has been extensive research in using machine learning algorithms to predict loan repayment outcomes, such as a 2017 paper published by Xiaojiao Yu that explores using an XGBoost model to predict online lending risk: \href{https://arxiv.org/abs/1707.04831}{Machine learning application in online lending risk prediction}\cite{2017arXiv170704831Y}.
 
 Home Credit targets a demographic that typically has no recourse but to deal with shady characters such as loan sharks when borrowing money. Many of these unbanked individuals are hard-working, well-intentioned folks who, either due to circumstances beyond their control or past mistakes, have fallen through the financial system’s cracks.
 
@@ -59,7 +59,7 @@ I want to live in a world where a second chance is available to anyone who would
 
 \section{Problem Statement}
 \label{problemstatement}
-Home Credit needs an algorithm that will take as inputs various personal and alternative financial information originally taken from a loan applicant's profile, and then determine a probability of the applicant having at least one late payment when repaying their loan. This probability will be in the range [0.0, 1.0], where 1.0 represents a 100\% certainty that the applicant will have at least one delinquent repayment and 0.0 indicates that there is zero chance that the applicant will ever be delinquent. The algorithm will be tested on a set of 48,744 individuals who previously borrowed from Home Credit. A CSV file must be produced that contains one header row, and 48,744 prediction rows, where each prediction row contains both a user ID, the \colorbox{backcolor}{\textcolor{red}{\texttt{SKI_ID_CURR}}} column, and the probability, the \colorbox{backcolor}{\textcolor{red}{\texttt{TARGET}}} column, of that user being delinquent. The file must be formatted as follows:
+Home Credit needs an algorithm that will take as inputs various personal and alternative financial information originally taken from a loan applicant's profile, and then determine a probability of the applicant having at least one late payment when repaying their loan. This probability will be in the range [0.0, 1.0], where 1.0 represents a 100\% certainty that the applicant will have at least one delinquent repayment and 0.0 indicates that there is zero chance that the applicant will ever be delinquent. The algorithm will be tested on a set of 48,744 individuals who previously borrowed from Home Credit. A CSV file must be produced that contains one header row, and 48,744 prediction rows, where each prediction row contains both a user ID, the \colorbox{backcolor}{\textcolor{black}{\texttt{SKI_ID_CURR}}} column, and the probability, the \colorbox{backcolor}{\textcolor{black}{\texttt{TARGET}}} column, of that user being delinquent. The file must be formatted as follows:
 
 \begin{lstlisting}
 SK_ID_CURR,TARGET
@@ -88,7 +88,13 @@ All of these features are spread across seven data tables. The main data table (
 The solution to this competition will be an algorithm that computes delinquency probabilities (in the range [0.0,1.0]) for each of the 48,744 Home Credit borrowers in the dataset's test segment. These predictions will be stored in a CSV file that adheres to the format described in the Problem Statement above in Section \ref{problemstatement}. This algorithm will take as inputs features from the seven data tables outlined above. It will be trained on the 307,511 Home Credit borrower records that comprise the training segment. The winning algorithm will predict the highest probabilities of delinquency for the borrowers who had at least one late payment, and will predict the lowest probabilities of delinquency for the borrowers who ultimately repaid their loans with no late payments. More formally, a winning algorithm will have the highest true positive rate, or sensitivity, (correctly guessing who will be delinuent), while at the same time having a minimum false positive rate (as seldom as possible making an incorrect guess that an individual will have difficulty paying back their loan).
 
 \section{Benchmark Model}
-Solutions to this competition will be ranked on Kaggle by the area under the ROC curve between their predicted proabilities and the observed targets (whether or not the borrower was actually delinquent). An ideal benchmark would be the area under ROC curve of the prediction model employed by Home Credit's data scientists prior to this competition's debut on Kaggle. However, since Home Credit possibly considers the specifics of this model and its ROC curve area to be proprietary information, it is understandable that they were not disclosed. As a next best alternative, I will use as a benchmark the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score.
+Solutions to this competition will be ranked on Kaggle by the area under the ROC curve between their predicted proabilities and the observed targets (whether or not the borrower was actually delinquent).
+
+I will train a Gaussian Naive Bayes classifier on a fully preprocessed dataset and use its ROC area under curve score as my primary benchmark. Gaussian Naive Bayes is ideal for this because it needs no hyperparameter input nor tuning. It also trains faster than most other models and I expect I should have no difficulty training it on the dataset's 300,000+ rows locally on my own machine. I am optimistic that with appropriate model selection and hyperparameter tuning I will eventually be able to build a learning algorithm that outperforms this out-of-the-box Gaussian Naive Bayes model.
+
+In order to guage how my solution compares to others in the Kaggle community, I will use the average ROC curve area of all entries on the competition's public leaderboard\cite{kagglehomecreditcompetitionpublicleaderboard} as of June 2, 2018 as a secondary, personal benchmark. As of this date, there were 5,398 total entries from 1,515 participants. The average area under the ROC curves of all entries was \colorbox{backcolor}{\textcolor{red}{\texttt{0.7379}}}. I hope to design an algorithm that will meet or exceed this score.
+
+It would also be nice to know the area under ROC curve of the prediction model employed by Home Credit's data scientists prior to this competition's debut on Kaggle. However, since Home Credit possibly considers this model and its ROC curve area to be proprietary information, it is understandable that it was not disclosed.
 
 \section{Evaluation Metric}
 The area under the ROC (receiver operating characteristic) curve\cite{wikipediaroc} will be the evaluation metric for my solution to this competition. This area can range from a minimum value of 0, or 0\%, to a maximum of 1, or 100\%. The size of the area under an ROC curve indicates how good a job a classifier does of identifying a certain target segment in a dataset. An area of 1 indicates that the classifier is perfect -- that it can find every true positive (exhibiting perfect sensitivity, or recall) without making any mistakes (not accidentally labelling some true negatives as false positives), thus also giving it perfect specificity, which leads to a false positive rate (1 - specificity), of zero. An area of 0 indicates that the classifier isn't able to find and properly label any of the true positives. An area of 0.5 is the level of performance we'd expect from a classifier that randomly labels each point in the dataset -- on the whole, this classifier would make just as many mistakes (false positives) as it makes correct predictions (true positives).
@@ -113,8 +119,8 @@ Although Home Credit provides seven data tables for this competition, for the pu
       \item Display number of features in each data table.
       \item Generate and display 5-row samples of each data table.
       \item Generate and display statistical descriptions of the numerical features of each data table that will be used by my algorithm.
-      \item Investigate whether any features in any of the data tables have "NaN" entries that will need to be handled, and whether some features have sparse enough data such that the entire feature should be removed.
-      \item Also investigate whether any borrowers (rows) in the main data table have 'NaN' for the majority of their feature entries. Some of these datapoints may also need to be removed.
+      \item Investigate whether any features in any of the data tables have `NaN' entries that will need to be handled, and whether some features have sparse enough data such that the entire feature should be removed.
+      \item Also investigate whether any borrowers (rows) in the main data table have `NaN' for the majority of their feature entries. Some of these datapoints may also need to be removed.
       \item Review the statistical descriptions of each numerical feature, and ensure that there are no other unexpected numerical entries in these features, eg. a feature having some negative numbers among its entries, where only positive numbers would be expected based on how the feature was defined by Home Credit.
       \item List the numerical features in the main data table that are not already identified as being normally distributed (they may eventually need to be log-normalized).
       \item List the categorical features in the main data table that will need to be one-hot encoded.
@@ -125,7 +131,7 @@ Although Home Credit provides seven data tables for this competition, for the pu
     \begin{enumerate}
       \item Plot histograms of the numerical features in the main data table, in order to confirm which ones are indeed already normally distributed.
       \item Plot histograms of the numerical features in the main data table that are supposedly not already normally distributed.
-      \item Identify any outliers that will need to be addressed.
+      \item Identify any features containing outliers that will need to be addressed.
     \end{enumerate}
   \item \textbf{Algorithms and Techniques to Consider}
     \begin{enumerate}
@@ -134,22 +140,18 @@ Although Home Credit provides seven data tables for this competition, for the pu
           \item Feature transformation and dimensionality reduction using Principle Component Analysis (PCA)
           \item Dimensionality reduction using Sparse Random Projection (in case using PCA is too taxing on my compute resources)
         \end{enumerate}
-        Note: Many of the features may well be correlated with each other, and thus not independent, so I cannot use a dimensionality reduction algorithm that assumes feature independence, such as Independent Component Analysis (ICA).
+
       \item \textbf{Learning Algorithms}:
 
-      Any algorithm that I use will need to not only be able to simply segment the data points into the ``delinquent repayers" and ``on-time repayers" categories, but must also be able to compute the probability that each data point in the test set belongs to the ``delinquent repayers" segment. These probabilities will naturally be higher for points that the algorithm labels as ``delinquent repayers," and will be lower for the points that are labeled as ``on-time repayers." This requirement automatically eliminates algorithms such as SVM, K-Means, Hierarchical Clustering from consideration.
-
-      Furthermore, since I already know that my solution will need to classify the data points into only two segments, any clustering algorithms that I use must allow me to specify the number of output clusters. This automatically rules out algorithms like DBSCAN.
+      Any algorithm that I use will need to not only be able to simply segment the data points into the ``delinquent repayers" and ``on-time repayers" categories, but must also be able to compute the probability that each data point in the test set belongs to the ``delinquent repayers" segment. These probabilities will hopefully be higher for points that the algorithm labels as ``delinquent repayers," and will be lower for the points that are labeled as ``on-time repayers." This requirement automatically eliminates algorithms such as SVM, K-Means, and Hierarchical Clustering from consideration.
 
       Below are several algorithms that meet the above criteria:
         \begin{enumerate}
           \item Classifier Algorithms:
             \begin{itemize}
+              \item Multi-layer Perceptron Classifier
               \item Logistic Regression Classifier
               \item Gaussian Naive Bayes Classifier
-              \item Decision Tree Classifier
-              \item Extra Tree Classifier
-              \item Multi-layer Perceptron Classifier
             \end{itemize}
           \item Ensemble Methods:
             \begin{itemize}
@@ -157,46 +159,43 @@ Although Home Credit provides seven data tables for this competition, for the pu
               \item Bagging Classifier
               \item Extra Trees Classifier
               \item Gradient Boosting Classifier
-              \item Random Forest Classifier
-            \end{itemize}
-          \item Clustering Algorithms:
-            \begin{itemize}
-              \item Gaussian Mixture Model Clustering
-              \item Bayesian Gaussian Mixture Model Clustering
             \end{itemize}
         \end{enumerate}
       \item \textbf{Other Techniques}:
         \begin{enumerate}
-          \item SelectKBest for feature selection.
           \item Gridsearch CV for hyperparameter tuning.
           \item Breaking the training set up into an 80\%-20\% train-test split, or use K-Fold Cross-Validation, for model selection.
+          \item SelectKBest for feature selection.
         \end{enumerate}
     \end{enumerate}
   \item \textbf{Data Preprocessing}
     \begin{enumerate}
+      \item Separate out training and testing target data into separate variables. Drop the targets column from both training and testing sets of the main data table.
       \item Apply one-hot encoding to all non-numerical features in the main data table.
-      \item Separate out training and testing target data into their own variables. Drop the targets column from both training and testing sets of the main data table.
       \item Apply non-linear feature scaling using the natural logarithm to any numerical features in the main data table that aren't already normally distributed.
-      \item Ensure all numerical features are scaled to the range [0.0,1.0]
+      \item Scale all numerical features are to the range [0.0,1.0].
+      \item Impute `NaN' values for numerical features.
+      \item Replace `NaN' with 0 for all binary categorical features.
       \item \textbf{Engineer} at least one feature based on some of the data contained in the six other data tables and append it to the main data table.
+      \item Build a preprocessing pipeline that can be used to apply the above steps in order to preprocess test sets before a classifier makes predictions on them.
     \end{enumerate}
   \item \textbf{Implementation}
     \begin{enumerate}
       \item \textbf{First and foremost}, it is absolutely necessary to set aside a validation segment from the training set in order to compare the different algorithms I attempt and to avoid overfitting. This should be about 20\% of the size of the original training set. Alternatively, K-Fold Cross-Validation could also be used.
       \item Run PCA or Sparse Random Projection on the features in the main data table.
       \item Plot the feature weights and display the explained variances of the dimensions outputted by the chosen dimensionality reduction algorithm, in order to get an idea of how many dimensions to use when classifying the data points.
-      \item Use sns.PairGridPlot to plot feature pair scatterplots of all dimensions outputted by the chosen dimensionality reduction algorithm, in order to see if any dimension pairs contain a decent separation between the two target segments (delinquent repayers vs. on-time repayers), and if so, whether the separation has a discernable geometry. This could help inform my decision of which algorithms to experiment with.
-      \item Create a training and prediction pipeline that outputs probability predictions for each data point in test segment to a CSV file, and also calculates and outputs the area under the ROC curve of the predictions.
       \item Create different classifiers, using some or all of the different classifier algorithms listed above.
+      \item Create a training and prediction pipeline that outputs probability predictions for each data point in test segment to a CSV file, and also calculates and outputs the area under the ROC curve of the predictions.
     \end{enumerate}
   \item \textbf{Refinement}
     \begin{enumerate}
-      \item Try using dimensions output by a dimensionality reduction algorithm (such as PCA). Also try using featuresets that are small subsets of individual original features in the main data table --  some subsets chosen by my own intuition about the data, and other subsets chosen by a feature selection algorithm such as SelectKBest.
-      \item Use Gridsearch CV for hyperparameter tuning.
-      \item Generate a table that ranks the test set scores (area under ROC curve) of all the different algorithms and featuresets that I experiment with.
+      \item Experiment with adjusting hyperparameters on the best performing classifier.
+      \item Try feature selection methods such as SelectKBest.
     \end{enumerate}
   \item \textbf{Model Evaluation and Validation}
     \begin{enumerate}
+      \item Generate a table that ranks the test set scores (area under ROC curve) of all the different algorithms and featuresets that I experiment with.
+      \item Plot ROC curves of the results from various classifier algorithms
       \item Choose the algorithm/featureset combo that had the highest score on the testing set.
       \item Conduct sensitivity analysis by manipulating some of the training data in order to ascertain the solution's robustness.
       \item Save the testing set predictions to a CSV file, and submit on Kaggle.

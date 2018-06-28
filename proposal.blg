@@ -1,15 +1,15 @@
 [0] Config.pm:302> INFO - This is Biber 2.11
 [0] Config.pm:305> INFO - Logfile is 'proposal.blg'
-[49] biber-darwin:313> INFO - === Mon Jun 18, 2018, 15:19:04
-[75] Biber.pm:371> INFO - Reading 'proposal.bcf'
-[169] Biber.pm:857> INFO - Found 6 citekeys in bib section 0
-[184] Biber.pm:3976> INFO - Processing section 0
-[197] Biber.pm:4136> INFO - Looking for bibtex format file 'capstone.bib' for section 0
-[198] bibtex.pm:1500> INFO - LaTeX decoding ...
-[206] bibtex.pm:1316> INFO - Found BibTeX data source 'capstone.bib'
-[239] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[239] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[239] Biber.pm:3804> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
-[239] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
-[251] bbl.pm:617> INFO - Writing 'proposal.bbl' with encoding 'UTF-8'
-[255] bbl.pm:720> INFO - Output to proposal.bbl
+[40] biber-darwin:313> INFO - === Sat Jun 23, 2018, 10:27:05
+[62] Biber.pm:371> INFO - Reading 'proposal.bcf'
+[156] Biber.pm:857> INFO - Found 7 citekeys in bib section 0
+[170] Biber.pm:3976> INFO - Processing section 0
+[182] Biber.pm:4136> INFO - Looking for bibtex format file 'capstone.bib' for section 0
+[183] bibtex.pm:1500> INFO - LaTeX decoding ...
+[196] bibtex.pm:1316> INFO - Found BibTeX data source 'capstone.bib'
+[233] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[233] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[234] Biber.pm:3804> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
+[234] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
+[245] bbl.pm:617> INFO - Writing 'proposal.bbl' with encoding 'UTF-8'
+[247] bbl.pm:720> INFO - Output to proposal.bbl
