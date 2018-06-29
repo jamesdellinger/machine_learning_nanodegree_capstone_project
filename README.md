@@ -20,7 +20,7 @@ https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/b
 
 [html version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.html)
 
-### Project Grading and Evaluation
+### Project Grading and Evaluation:
 
 [Capstone Project Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_review.pdf)
 
