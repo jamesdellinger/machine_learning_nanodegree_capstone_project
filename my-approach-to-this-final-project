@@ -1,0 +1,19 @@
+Thanks so much for the thorough review and encouraging words! As requested, here is some more background info on my process of working on my project:
+
+i. I spent approximately 1/4 of my time researching techniques and algorithms, 1/2 of my time exploring and preprocessing the dataset, and the final 1/4 of my time implementing various learning algorithms and writing my report. I worked on this project for exactly one month, working about 5-6 days each week and at least 4 hours (but often several more) each day.
+
+ii.  By far and away, the biggest challenge I faced was limited compute power.
+
+iii. However, this challenge was actually probably the key to my success on this project. What I mean is that from the onset, I knew I wouldn't be able to achieve a high score on Kaggle by using a high powered algorithm trained over a multiple-day period. Instead, I knew that my main advantage could come from taking the time to really get to know all the ins, outs, and quirks of the Home Credit data set.
+
+iv. I was optimistic that this knowledge could help me to make smarter choices about which features to use, how to preprocess those features, and ultimately, which learning algorithms would work best with those features.
+
+v. After all, you don't a fast workstation with lots of cores and GPUs in order to gain a deep intuition on your dataset -- all that's required is persistence and grit, and approaching the dataset like a detective.
+
+vi. Finally, when it came time to tune my learning algorithm, I couldn't use GridSearchCV to brute-force my way to the best possible hyperparameters.
+
+vii. But again this limitation actually became an advantage, in that it forced me to learn from first principles what each of LightGBM's hyperparameters was designed to do. This knowledge helped give me a better intuition about which hyperparameters to spend time tuning manually, and which pairs or trios of hyperparameters to investigate using GridSearchCV.
+
+viii. I spent a ridiculously long amount of time on this project because I firmly believe that I only learn as much as the effort I put into learning. I'm somewhat unique I think in that I tend to learn best by working and studying on my own. I love Udacity because it gives me a structured framework where I can begin my learning journey with almost no domain-specific knowledge and work my way up to a quasi-quasi-expert level if I'm willing to put in the time to build on top of the foundation of initial knowledge that Udacity helps me construct.
+
+ix. Thanks!

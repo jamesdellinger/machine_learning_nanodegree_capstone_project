@@ -20,6 +20,16 @@ https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/b
 
 [html version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.html)
 
+### Project Grading and Evaluation
+
+[Capstone Project Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_review.pdf)
+
+[Capstone Project Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_grading_rubric.pdf)
+
+[Capstone Project Proposal Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_project_review.pdf)
+
+[Capstone Project Proposal Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf)
+
 ### The Python environment requirements are here:
 
 [requirements.txt](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/requirements.txt)
