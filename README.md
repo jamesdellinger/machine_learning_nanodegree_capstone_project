@@ -5,13 +5,18 @@
 
 ### Topic: Specialization
 
+### Summary:
+
+* I applied extensive exploration and preprocessing to the Home Credit Default Risk competition's [dataset](https://www.kaggle.com/c/home-credit-default-risk/data).
+* I then fit a LightGBM classifier to this data in order predict which borrowers are most likely to have difficulty repaying their loans.
+
 ### My capstone project report is here:
 
 * [Report pdf](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf)
 
 ### My capstone project proposal is here:
 
-* [Proposal](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf)
+* [Proposal pdf](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf)
 
 ### The code for my competition solution is here:
 
