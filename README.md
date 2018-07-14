@@ -33,7 +33,7 @@
 * [Capstone Project Proposal Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf)
 
 ### Competition Overview:
-For my capstone project I will participate in the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on Kaggle. The goal of the competition is to be able to predict the likelihood that an applicant will make at least one late payment when repaying their loan. The competition is sponsored by [Home Credit](http://www.homecredit.net), whose mission is to provide a positive and safe borrowing experience to groups of people that traditional, mainstream banks and financial institutions typically refuse to serve.
+I participated in the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on Kaggle. The goal of the competition is to be able to predict the likelihood that an applicant will make at least one late payment when repaying their loan. The competition is sponsored by [Home Credit](http://www.homecredit.net), whose mission is to provide a positive and safe borrowing experience to groups of people that traditional, mainstream banks and financial institutions typically refuse to serve.
 
 Home Credit targets a demographic that typically has no recourse but to deal with shady characters such as loan sharks when borrowing money. Many of these unbanked individuals are hard-working, well-intentioned folks who, either due to circumstances beyond their control or past mistakes, have fallen through the financial system’s cracks.
 
