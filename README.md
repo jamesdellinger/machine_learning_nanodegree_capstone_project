@@ -68,6 +68,6 @@ In order to reproduce my results, the following eight CSV files must be download
 
 ### Dependencies:
 
-[requirements.txt](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/requirements.txt)
+* [requirements.txt](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/requirements.txt)
 
-[Anaconda .yml file](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk_competition.yml)
+* [Anaconda .yml file](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk_competition.yml)
