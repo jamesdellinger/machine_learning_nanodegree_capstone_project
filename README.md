@@ -1,36 +1,35 @@
-# Capstone Project
-## Machine Learning Engineer Nanodegree
-## Topic: Specialization
-
+# Machine Learning Capstone Project
 *Applying machine learning algorithms and techniques to solve the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on Kaggle.*
+### Machine Learning Engineer Nanodegree
+<img src="https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/mlndlogo.png" height="140">
+
+### Topic: Specialization
+
+
 
 ### My capstone project report is here:
 
-https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf
+* https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf
 
 ### My capstone project proposal is here:
 
-https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf
+* https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf
 
 ### The code for my competition solution is here:
 
-[ipython notebook](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.ipynb)
-
-[pdf version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.pdf)
-
-[html version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.html)
+* [ipython notebook](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.ipynb) / [html version](http://htmlpreview.github.com/?https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.html) / [pdf version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.pdf)
 
 ### Project Grading and Evaluation:
 
-[Capstone Project Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_review.pdf)
+* [Capstone Project Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_review.pdf)
 
-[Capstone Project Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_grading_rubric.pdf)
+* [Capstone Project Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_grading_rubric.pdf)
 
-[Capstone Project Proposal Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_project_review.pdf)
+* [Capstone Project Proposal Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_project_review.pdf)
 
-[Capstone Project Proposal Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf)
+* [Capstone Project Proposal Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf)
 
-### The Python environment requirements are here:
+### Dependencies:
 
 [requirements.txt](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/requirements.txt)
 
