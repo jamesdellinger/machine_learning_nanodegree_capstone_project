@@ -20,11 +20,11 @@ Topic: Specialization.
 
 * [Proposal pdf](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf)
 
-### The code for my competition solution:
+## The code for my competition solution:
 
 * [ipython notebook](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.ipynb) / [pdf version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.pdf)
 
-### Project Grading and Evaluation:
+## Project Grading and Evaluation:
 
 * [Capstone Project Review](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_project_review.pdf)
 
