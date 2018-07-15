@@ -1,24 +1,26 @@
 # Machine Learning Capstone Project
 *Applying machine learning algorithms and techniques to solve the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle.*
-### For Udacity's Machine Learning Engineer Nanodegree
+
 <img src="https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/mlndlogo.png" height="140">
 
-### Topic: Specialization
+For Udacity's [Machine Learning Engineer](https://www.udacity.com/course/machine-learning-engineer-nanodegree--nd009t) Nanodegree.
 
-### Summary:
+Topic: Specialization.
+
+## Overview:
 
 * I applied extensive exploration and preprocessing to the Home Credit Default Risk competition's [dataset](https://www.kaggle.com/c/home-credit-default-risk/data).
 * I then fit a LightGBM classifier to this data in order predict which borrowers are most likely to have difficulty repaying their loans.
 
-### My capstone project report is here:
+## My capstone project report:
 
 * [Report pdf](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf)
 
-### My capstone project proposal is here:
+## My capstone project proposal:
 
 * [Proposal pdf](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/proposal.pdf)
 
-### The code for my competition solution is here:
+### The code for my competition solution:
 
 * [ipython notebook](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.ipynb) / [pdf version](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/home_credit_default_risk.pdf)
 
@@ -32,8 +34,8 @@
 
 * [Capstone Project Proposal Grading Rubric](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/capstone_proposal_grading_rubric.pdf)
 
-### Competition Overview:
-I participated in the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on Kaggle. The goal of the competition is to be able to predict the likelihood that an applicant will make at least one late payment when repaying their loan. The competition is sponsored by [Home Credit](http://www.homecredit.net), whose mission is to provide a positive and safe borrowing experience to groups of people that traditional, mainstream banks and financial institutions typically refuse to serve.
+## Home Credit Default Risk Competition Synopsis:
+The goal of the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on Kaggle is the creation of a machine learning algorithm that is able to predict the likelihood that an loan applicant will make at least one late payment when repaying their loan. The competition is sponsored by [Home Credit](http://www.homecredit.net), whose mission is to provide a positive and safe borrowing experience to groups of people that traditional, mainstream banks and financial institutions typically refuse to serve.
 
 Home Credit targets a demographic that typically has no recourse but to deal with shady characters such as loan sharks when borrowing money. Many of these unbanked individuals are hard-working, well-intentioned folks who, either due to circumstances beyond their control or past mistakes, have fallen through the financial system’s cracks.
 
@@ -51,7 +53,7 @@ Home Credit knows which borrowers ultimately made at least one late payment, and
 
 The scoring metric for submissions is area under the [ROC curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic). The best performing submissions are ranked on the competition's [leaderboard](https://www.kaggle.com/c/home-credit-default-risk/leaderboard).
 
-### The competition's data tables are available here:
+## The competition's data tables:
 
 https://www.kaggle.com/c/home-credit-default-risk/data
 
@@ -66,7 +68,7 @@ In order to reproduce my results, the following eight CSV files must be download
 7. [POS_CASH_balance.csv.zip](https://www.kaggle.com/c/9120/download/POS_CASH_balance.csv.zip)
 8. [previous_application.csv.zip](https://www.kaggle.com/c/9120/download/previous_application.csv.zip)
 
-### Dependencies:
+## Dependencies:
 
 * [requirements.txt](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/requirements.txt)
 
