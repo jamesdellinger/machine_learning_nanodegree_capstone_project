@@ -1,5 +1,5 @@
 # Machine Learning Capstone Project
-*Applying machine learning algorithms and techniques to solve the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle.*
+*Applying machine learning algorithms and techniques to submit a solution to the* ***live*** *[Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle.*
 
 <img src="https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/mlndlogo.png" height="140">
 
@@ -8,7 +8,8 @@ For Udacity's [Machine Learning Engineer](https://www.udacity.com/course/machine
 Topic: Specialization.
 
 ## Overview
-* I applied extensive exploration and preprocessing to the Home Credit Default Risk competition's [dataset](https://www.kaggle.com/c/home-credit-default-risk/data).
+* Participated in the **live** [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) kaggle competition during June of 2018, while it was still ongoing. The competition ended on August 29, 2018.
+* I applied extensive exploration and preprocessing to the competition's [dataset](https://www.kaggle.com/c/home-credit-default-risk/data).
 * I then fit a LightGBM classifier to this data in order predict which borrowers are most likely to have difficulty repaying their loans.
 
 ## My Capstone Project Report
