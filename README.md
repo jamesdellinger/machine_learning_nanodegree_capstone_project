@@ -1,5 +1,5 @@
 # Machine Learning Capstone Project
-*Applying machine learning algorithms and techniques to submit a solution to the* ***live*** *[Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle.*
+*Applying machine learning algorithms and techniques to submit a solution to the* ***live, ongoing*** *[Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle.*
 
 <img src="https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/mlndlogo.png" height="140">
 
