@@ -1,5 +1,5 @@
 # Machine Learning Capstone Project
-*Applying machine learning algorithms and techniques to submit a solution to the* ***live, ongoing*** *[Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle.*
+*Applying machine learning algorithms and techniques to submit a solution to the [Home Credit Default Risk competition](https://www.kaggle.com/c/home-credit-default-risk) on kaggle, while the competition was live.*
 
 <img src="https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/mlndlogo.png" height="140">
 
@@ -8,9 +8,16 @@ For Udacity's [Machine Learning Engineer](https://www.udacity.com/course/machine
 Topic: Specialization.
 
 ## Overview
-* Participated in the **live** [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) kaggle competition during June of 2018, while it was still ongoing. The competition ended on August 29, 2018.
+* Participated in the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) kaggle competition during June of 2018, and earned a public leaderboard score of `0.74111`.
+* After finishing this project writeup, I kept refining my algorithm for the next two months, and was ultimately able to achieve a final private leaderboard score of `0.79506` when the competition ended on August 29, 2018.
+* This put my solo submission inside the top 8% and was good enough to earn me a bronze medal in the competition.
+* My best performing kernel is [here on kaggle](https://www.kaggle.com/jamesdellinger/home-credit-putting-all-the-steps-together).
+
+## Concepts
 * I applied extensive exploration and preprocessing to the competition's [dataset](https://www.kaggle.com/c/home-credit-default-risk/data).
-* I then fit a LightGBM classifier to this data in order predict which borrowers are most likely to have difficulty repaying their loans.
+* Compared the performance various learning models/featuresets/dimensionality reduction.
+* Engineered a handful of new features.
+* Ultimately got best results by fitting a LightGBM model to the full featureset, in order predict which borrowers are most likely to have difficulty repaying their loans.
 
 ## My Capstone Project Report
 * [Report pdf](https://github.com/jamesdellinger/machine_learning_nanodegree_capstone_project/blob/master/report.pdf)
